@@ -4,5 +4,8 @@ build/*
 # Ignore any executables
 bin/*
 
+# Ignore artificats of vscode IDE
+.vscode/*
+
 # Ignore Mac specific files
 .DS_Store
