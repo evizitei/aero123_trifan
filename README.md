@@ -46,3 +46,13 @@ but any modern c++ compiler should do fine.
 If you want to remove any existing build artifacts you can use:
 
 `make clean`
+
+## Running tests
+
+To avoid external dependencies, tests are just executed
+as assert statements factored into methods.
+
+All tests that currently exist for the project can be run with
+the make task:
+
+`make test`
