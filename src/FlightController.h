@@ -22,5 +22,6 @@ private:
 
 public:
     FlightController();
+    int getMotorSpeed(int motorIndex);
     std::string getStatus();
 };
