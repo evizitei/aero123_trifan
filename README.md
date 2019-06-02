@@ -26,4 +26,23 @@ Each subdirectory has a specific purpose.
 
 - **test/** any test files for the application source files can live in this directory.
 
+## Project Building
 
+This project strives to use no external libraries, and
+has no special hardware drivers at the moment.  That means
+you shoud not need any specificl compiler flags to build it.
+Making a binary should be as easy as `make build`, which will
+use `clang` to build the project.  For refence, this
+has been tested with the following clang version:
+
+```
+Apple LLVM version 10.0.1 (clang-1001.0.46.4)
+Target: x86_64-apple-darwin18.5.0
+Thread model: posix
+```
+
+but any modern c++ compiler should do fine.
+
+If you want to remove any existing build artifacts you can use:
+
+`make clean`
