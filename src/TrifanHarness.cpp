@@ -5,8 +5,8 @@
 int main()
 {
     std::cout << "Trifan initializing...\n";
-    FlightController ctrl;
-    std::cout << ctrl.getStatus() << "\n" << "...Initialized!\n";
+    FlightController* ctrl = new FlightController;
+    std::cout << ctrl->getStatus() << "\n" << "...Initialized!\n";
     std::string flight_command;
     while(true) {
         std::cout << "Input command...\n";
@@ -17,5 +17,6 @@ int main()
             break;
         }
     }
+    delete ctrl;
     return 0;
 }

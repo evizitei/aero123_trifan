@@ -1,5 +1,16 @@
 #include <string>
 
+struct PropConfig {
+    int bottom_speed;
+    int top_speed;
+};
+
+struct TrifanMotorConfig {
+    PropConfig right_prop;
+    PropConfig back_prop;
+    PropConfig left_prop;
+};
+
 /*
 internal members are confirgured to match
 the main hardware outputs from a VTOL tiltrotor
@@ -23,5 +34,7 @@ private:
 public:
     FlightController();
     int getMotorSpeed(int motorIndex);
+    void updateMotors(TrifanMotorConfig conf);
     std::string getStatus();
 };
+
