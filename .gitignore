@@ -12,3 +12,4 @@ bin/*
 
 # created by each flight
 flight.log
+test.log

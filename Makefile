@@ -6,7 +6,7 @@ TESTDIR := test
 BINNAME := trifan
 
 build:
-	$(CC) --std=c++11 -o $(BINDIR)/$(BINNAME) $(SRCDIR)/TrifanHarness.cpp $(SRCDIR)/FlightController.cpp $(SRCDIR)/FlightLog.cpp
+	$(CC) --std=c++11 -o $(BINDIR)/$(BINNAME) $(SRCDIR)/*.cpp
 
 clean:
 	@echo " Cleaning..."; 

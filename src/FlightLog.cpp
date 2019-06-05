@@ -30,6 +30,13 @@ void FlightLog::logMessage(std::string message)
     mtx.unlock();
 }
 
+void FlightLog::close()
+{
+    mtx.lock();
+    logStream.close();
+    mtx.unlock();
+}
+
 void FlightLog::run()
 {
     int logInterval = 3;
@@ -41,10 +48,7 @@ void FlightLog::run()
             break;
         }
     }
-    mtx.lock();
-    logStream.close();
-    mtx.unlock();
-    return;
+    close();
 }
 
 void FlightLog::signalStop()

@@ -12,11 +12,15 @@ private:
     std::string logFileName;
     bool shouldClose;
     std::mutex mtx;
-    void logTime();
-    void logMessage(std::string message);
 
 public:
     FlightLog(FlightController* cPtr, std::string fn);
+    /* generally, just use "run", unless you want 
+    fine grained contorl over when and
+    where logging events happen.*/
     void run();
+    void close();
+    void logTime();
+    void logMessage(std::string message);
     void signalStop();
 };
