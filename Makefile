@@ -13,7 +13,7 @@ clean:
 	rm $(BUILDDIR)/*
 	rm $(BINDIR)/*
 
-run:
+run: build
 	$(BINDIR)/$(BINNAME)
 
 test:

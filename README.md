@@ -47,6 +47,26 @@ If you want to remove any existing build artifacts you can use:
 
 `make clean`
 
+To execute the flight controller, you can use
+
+`make run`
+
+which will re-build the binary and run it.
+Two threads will be started, one to accept
+command input, and one to log the status of the
+system to the flight log on disk.
+
+Valid commands:
+
+- **shutdown**: exit the program entirely
+
+To see the log after a flight, you can read through `flight.log`,
+or alternatively tail the log while the flight is in progress
+in another console:
+
+`tail -f flight.log`
+
+
 ## Running tests
 
 To avoid external dependencies, tests are just executed
