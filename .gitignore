@@ -9,3 +9,6 @@ bin/*
 
 # Ignore Mac specific files
 .DS_Store
+
+# created by each flight
+flight.log

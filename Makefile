@@ -6,7 +6,7 @@ TESTDIR := test
 BINNAME := trifan
 
 build:
-	$(CC) -o $(BINDIR)/$(BINNAME) $(SRCDIR)/TrifanHarness.cpp $(SRCDIR)/FlightController.cpp
+	$(CC) --std=c++11 -o $(BINDIR)/$(BINNAME) $(SRCDIR)/TrifanHarness.cpp $(SRCDIR)/FlightController.cpp $(SRCDIR)/FlightLog.cpp
 
 clean:
 	@echo " Cleaning..."; 
@@ -17,7 +17,7 @@ run:
 	$(BINDIR)/$(BINNAME)
 
 test:
-	$(CC) -o $(TESTDIR)/bin/system_tests $(TESTDIR)/TrifanTest.cpp $(SRCDIR)/FlightController.cpp
+	$(CC) --std=c++11 -o $(TESTDIR)/bin/system_tests $(TESTDIR)/TrifanTest.cpp $(SRCDIR)/FlightController.cpp $(SRCDIR)/FlightLog.cpp
 	./test/bin/system_tests
 
 .PHONY: clean build test

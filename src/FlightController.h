@@ -1,3 +1,4 @@
+#include <mutex>
 #include <string>
 
 struct PropConfig {
@@ -30,6 +31,7 @@ private:
     int elevon_one_angle;
     int elevon_two_angle;
     int landing_gear_servo_angle;
+    std::mutex mtx;
 
 public:
     FlightController();
