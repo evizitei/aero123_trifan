@@ -3,6 +3,7 @@ build/*
 
 # Ignore any executables
 bin/*
+test/bin/*
 
 # Ignore artificats of vscode IDE
 .vscode/*
