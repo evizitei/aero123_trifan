@@ -45,11 +45,21 @@ bool TestFlightLogging()
     return true;
 }
 
+bool TestGpsInit()
+{
+    Gps gps { stable };
+    assert(gps.getAltitude() == 0.0);
+    assert(gps.getLatitude() == 38.9579);
+    assert(gps.getLongitude() == -92.3264);
+    return true;
+}
+
 int main ()
 {
     TestMotorInit();
     TestFlightStatusMessage();
     TestFlightLogging();
+    TestGpsInit();
     std::cout << "----------\n" << "All Tests Pass!\n" << "----------\n";
     return 0;
 }

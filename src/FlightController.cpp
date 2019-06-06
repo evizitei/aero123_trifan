@@ -68,7 +68,7 @@ std::string FlightController::getStatus()
 {
     mtx.lock();
     std::string status("FLIGHT STATUS\n");
-    status = status + "  MOTORS[ RB: " + std::to_string(motor_front_right_bottom_speed);
+    status = status + "  MOTORS [ RB: " + std::to_string(motor_front_right_bottom_speed);
     status = status + " RT: " + std::to_string(motor_front_right_top_speed);
     status = status + " BB: " + std::to_string(motor_back_bottom_speed);
     status = status + " BT: " + std::to_string(motor_back_top_speed);
@@ -78,6 +78,9 @@ std::string FlightController::getStatus()
     status = status + "  TILT Srv: " + std::to_string(tilt_servo_angle) + "\n";
     status = status + "  ELEVONS [ ONE: " + std::to_string(elevon_one_angle) + " TWO: " + std::to_string(elevon_two_angle) + " ]\n";
     status = status + "  GEAR Srv: " + std::to_string(landing_gear_servo_angle) + "\n";
+    status = status + "  LOCATION [ LAT: " + std::to_string(gpsPtr->getLatitude());
+    status = status + " LNG: " + std::to_string(gpsPtr->getLongitude());
+    status = status + " ALT: " + std::to_string(gpsPtr->getAltitude()) + " ]\n";
     mtx.unlock();
     return status;
 }
