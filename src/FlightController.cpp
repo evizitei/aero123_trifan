@@ -52,6 +52,11 @@ int FlightController::getMotorSpeed(int motorIndex)
     return speedValue;
 }
 
+int FlightController::getTiltAngle()
+{
+    return tilt_servo_angle;
+}
+
 void FlightController::updateMotors(TrifanMotorConfig conf)
 {
     mtx.lock();
@@ -62,6 +67,18 @@ void FlightController::updateMotors(TrifanMotorConfig conf)
     motor_front_left_bottom_speed = conf.left_prop.bottom_speed;
     motor_front_left_top_speed = conf.left_prop.top_speed;
     mtx.unlock();
+}
+
+// Convenience method when you want to set all motors to the same
+// rpm level with a simple parameter
+void FlightController::updateMotors(int rpm)
+{
+    TrifanMotorConfig cfg = {
+        { rpm, rpm},
+        { rpm, rpm},
+        { rpm, rpm}
+    };
+    updateMotors(cfg);
 }
 
 std::string FlightController::getStatus()

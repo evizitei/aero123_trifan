@@ -39,7 +39,9 @@ private:
 public:
     FlightController(Gps* gps);
     int getMotorSpeed(int motorIndex);
+    int getTiltAngle();
     void updateMotors(TrifanMotorConfig conf);
+    void updateMotors(int rpm);
     std::string getStatus();
 };
 

@@ -3,10 +3,12 @@
 Gps::Gps(gps_sim_type st)
 {
     // assume initial location is Columbia College
+    mtx.lock();
     lat = 38.9579;
     lng = -92.3264;
     alt = 0.0;
     sim_t = st;
+    mtx.unlock();
 }
 
 double Gps::getLatitude()
@@ -22,4 +24,11 @@ double Gps::getLongitude()
 double Gps::getAltitude()
 {
     return alt;
+}
+
+void Gps::updateAltitude(double delta)
+{
+    mtx.lock();
+    alt = alt + delta;
+    mtx.unlock();
 }
