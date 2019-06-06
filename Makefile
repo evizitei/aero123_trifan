@@ -17,7 +17,7 @@ run: build
 	$(BINDIR)/$(BINNAME)
 
 test:
-	$(CC) --std=c++11 -o $(TESTDIR)/bin/system_tests $(TESTDIR)/TrifanTest.cpp $(SRCDIR)/FlightController.cpp $(SRCDIR)/FlightLog.cpp
+	$(CC) --std=c++11 -o $(TESTDIR)/bin/system_tests $(TESTDIR)/TrifanTest.cpp $(SRCDIR)/FlightController.cpp $(SRCDIR)/FlightLog.cpp $(SRCDIR)/Gps.cpp
 	./test/bin/system_tests
 
 .PHONY: clean build test

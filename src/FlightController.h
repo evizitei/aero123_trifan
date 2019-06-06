@@ -12,6 +12,8 @@ struct TrifanMotorConfig {
     PropConfig left_prop;
 };
 
+class Gps;
+
 /*
 internal members are confirgured to match
 the main hardware outputs from a VTOL tiltrotor
@@ -21,6 +23,7 @@ https://docs.px4.io/en/airframes/airframe_reference.html#vtol-tiltrotor
 class FlightController
 {
 private:
+    Gps* gpsPtr;
     int motor_front_right_bottom_speed;
     int motor_front_right_top_speed;
     int motor_back_bottom_speed;
@@ -34,7 +37,7 @@ private:
     std::mutex mtx;
 
 public:
-    FlightController();
+    FlightController(Gps* gps);
     int getMotorSpeed(int motorIndex);
     void updateMotors(TrifanMotorConfig conf);
     std::string getStatus();

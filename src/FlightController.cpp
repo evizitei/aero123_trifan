@@ -1,9 +1,11 @@
 #include "FlightController.h"
+#include "Gps.h"
 #include <string>
 
-FlightController::FlightController()
+FlightController::FlightController(Gps* gps)
 {
     mtx.lock();
+    gpsPtr = gps;
     motor_front_right_bottom_speed = 0;
     motor_front_right_top_speed = 0;
     motor_back_bottom_speed = 0;

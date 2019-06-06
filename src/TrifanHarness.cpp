@@ -1,5 +1,6 @@
 #include "FlightController.h"
 #include "FlightLog.h"
+#include "Gps.h"
 #include <iostream>
 #include <string>
 #include <thread>
@@ -7,10 +8,12 @@
 void loggerThread(FlightLog* fPtr){
     fPtr->run();
 }
+
 int main()
 {
     std::cout << "Trifan initializing...\n";
-    FlightController* ctrl = new FlightController;
+    Gps* gps = new Gps(stable);
+    FlightController* ctrl = new FlightController(gps);
     std::string log_name = "flight.log";
     int log_interval = 3; // write status ever 3 seconds
     FlightLog* fLog = new FlightLog(ctrl, log_name);

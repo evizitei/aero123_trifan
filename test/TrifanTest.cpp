@@ -1,12 +1,14 @@
 #include <iostream>
 #include <fstream>
-#include <assert.h>     /* assert */
+#include <assert.h>
 #include "../src/FlightController.h"
 #include "../src/FlightLog.h"
+#include "../src/Gps.h"
 
 bool TestMotorInit()
 {
-    FlightController ctrl;
+    Gps gps { stable };
+    FlightController ctrl { &gps };
     int speed = ctrl.getMotorSpeed(0);
     assert(speed == 0);
     return true;
@@ -14,7 +16,8 @@ bool TestMotorInit()
 
 bool TestFlightStatusMessage()
 {
-    FlightController ctrl;
+    Gps gps { stable };
+    FlightController ctrl { &gps };
     TrifanMotorConfig cfg = {
         { 3, 3},
         { 3, 3},
@@ -26,9 +29,10 @@ bool TestFlightStatusMessage()
     return true;
 }
 
-bool TestFlightLogging()
+bool TestFlightLogging() 
 {
-    FlightController ctrl;
+    Gps gps { stable };
+    FlightController ctrl { &gps };
     FlightLog* fLog = new FlightLog(&ctrl, "test.log");
     fLog->logMessage("Test The Messaging");
     fLog->close();
