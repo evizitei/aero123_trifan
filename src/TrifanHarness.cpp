@@ -25,7 +25,11 @@ int main()
     Simulator* sim = new Simulator(ctrl, gps);
     std::cout << ctrl->getStatus() << "\n" << "...Initialized!\n" << "Logging to " << log_name << "\n\n";
     std::string flight_command;
+    // background threads
+    // the first one writes to the flight log every three seconds
     std::thread lt(loggerThread, fLog);
+    // this one updates the GPS position from the
+    // flight configuration (approximately)
     std::thread st(simThread, sim);
     while(true) {
         std::cout << "Input command...\n";
