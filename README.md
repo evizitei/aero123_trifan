@@ -44,7 +44,11 @@ Thread model: posix
 but any modern c++ compiler should do fine.
 
 ### IF YOU'RE USING CYGWIN ON WINDOWS
-You'll need to install cygwin, and while installing you need to
+
+If you'd like an editor amenable to this kind of process, consider installing
+(vscode)[https://code.visualstudio.com/].
+
+You'll need to install (cygwin)[https://cygwin.com/install.html], and while installing you need to
 make sure you select the packages
 
 `make`,`git`, and  `gcc-g++` from cygwins package selections.
@@ -52,9 +56,13 @@ make sure you select the packages
 1) Open cygwin, you should get a terminal.
 
 2) Make sure you have the necessary tools:
+
 `which make`
+
 `which git`
+
 `which gcc`
+
 Each of those commands should give you a path showing you that 
 an executable exists. If they don't, install cygwin again and make
 sure to install the packages listed above.
@@ -72,10 +80,14 @@ github:
 5) change into the root of that directory and make sure you can build:
 
 `cd aero123_trifan.git`
+
 `make build`
 
 Then you should be able to do the commands that follow below just like a mac or linux user.
 
+#### End Windows-only Section
+
+### Building and Running!
 
 If you want to remove any existing build artifacts you can use:
 
