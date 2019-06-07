@@ -149,12 +149,13 @@ void Simulator::run()
         {
             simulateTransitionalFlight();
         }
-        logMessage(getStatus());
+        logMessage(getStatus() + ctrl->getStatus());
         if(shouldStop){
             break;
         }
     }
     mtx.lock();
+    logStream.flush();
     logStream.close();
     mtx.unlock();
 }
@@ -173,6 +174,7 @@ void Simulator::logMessage(std::string message)
     logTime();
     mtx.lock();
     logStream << "***************************\n" << message << "\n***************************\n\n";
+    logStream.flush();
     mtx.unlock();
 }
 

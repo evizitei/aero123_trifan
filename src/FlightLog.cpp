@@ -27,19 +27,21 @@ void FlightLog::logMessage(std::string message)
     logTime();
     mtx.lock();
     logStream << "***************************\n" << message << "\n***************************\n\n";
+    logStream.flush();
     mtx.unlock();
 }
 
 void FlightLog::close()
 {
     mtx.lock();
+    logStream.flush();
     logStream.close();
     mtx.unlock();
 }
 
 void FlightLog::run()
 {
-    int logInterval = 3;
+    int logInterval = 1;
     logMessage("Flight Log Begins");
     while (true){
         std::this_thread::sleep_for(std::chrono::milliseconds(logInterval * 1000));

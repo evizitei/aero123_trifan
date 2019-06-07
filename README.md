@@ -61,11 +61,17 @@ system to the flight log on disk.
 The CLI will provide you with commands you can use to "control"
 the flight.
 
-To see the log after a flight, you can read through `flight.log`,
+To see the log after a flight, you can read through `simulator.log` and `flight.log`,
 or alternatively tail the log while the flight is in progress
 in another console:
 
-`tail -f flight.log`
+`tail -f simulator.log`
+
+The simulator log has both the status of each device, and also the
+inferred values of things like heading and AOA from the simulator
+status, which is useful for figuring out how control changes
+translated into flight status changes.  The simulator.log has everything
+in the flight.log.
 
 
 ## Running tests
