@@ -49,7 +49,33 @@ make sure you select the packages
 
 `make`,`git`, and  `gcc-g++` from cygwins package selections.
 
-### END WINDOWS CHUNK
+1) Open cygwin, you should get a terminal.
+
+2) Make sure you have the necessary tools:
+`which make`
+`which git`
+`which gcc`
+Each of those commands should give you a path showing you that 
+an executable exists. If they don't, install cygwin again and make
+sure to install the packages listed above.
+
+3) In cygwin, make a new directory to hold your software projects in.
+Mine is just called "Code", but whatever you want:
+
+`mkdir Code`
+
+4) switch into that directory, and use git to clone the project from
+github:
+
+`git clone https://github.com/evizitei/aero123_trifan.git`
+
+5) change into the root of that directory and make sure you can build:
+
+`cd aero123_trifan.git`
+`make build`
+
+Then you should be able to do the commands that follow below just like a mac or linux user.
+
 
 If you want to remove any existing build artifacts you can use:
 
