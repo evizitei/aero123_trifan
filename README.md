@@ -43,6 +43,14 @@ Thread model: posix
 
 but any modern c++ compiler should do fine.
 
+### IF YOU'RE USING CYGWIN ON WINDOWS
+You'll need to install cygwin, and while installing you need to
+make sure you select the packages
+
+`make`,`git`, and  `gcc-g++` from cygwins package selections.
+
+### END WINDOWS CHUNK
+
 If you want to remove any existing build artifacts you can use:
 
 `make clean`
