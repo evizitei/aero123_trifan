@@ -32,3 +32,11 @@ void Gps::updateAltitude(double delta)
     alt = alt + delta;
     mtx.unlock();
 }
+
+void Gps::updatePosition(double delatLat, double deltaLng)
+{
+    mtx.lock();
+    lat = lat + delatLat;
+    lng = lng + deltaLng;
+    mtx.unlock();
+}

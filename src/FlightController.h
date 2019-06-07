@@ -31,8 +31,8 @@ private:
     int motor_front_left_bottom_speed;
     int motor_front_left_top_speed;
     int tilt_servo_angle;
-    int elevon_one_angle;
-    int elevon_two_angle;
+    int elevon_right_angle;
+    int elevon_left_angle;
     int landing_gear_servo_angle;
     std::mutex mtx;
 
@@ -40,8 +40,12 @@ public:
     FlightController(Gps* gps);
     int getMotorSpeed(int motorIndex);
     int getTiltAngle();
+    int getElevonAngle(int elevonIndex);
     void updateMotors(TrifanMotorConfig conf);
     void updateMotors(int rpm);
+    void setGearSrv(int degrees);
+    void tiltProps(int degrees);
+    void setElevons(int angle);
     std::string getStatus();
 };
 

@@ -1,4 +1,5 @@
 #include <mutex>
+
 enum gps_sim_type { stable, flaky, broken };
 
 class Gps
@@ -18,4 +19,5 @@ public:
     // THESE METHODS ARE FOR THE SIMULATER
     // AIRFRAME SHOULD NOT ACCESS AT ALL!
     void updateAltitude(double delta);
+    void updatePosition(double deltaLat, double deltaLng);
 };

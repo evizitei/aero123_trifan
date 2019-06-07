@@ -1,5 +1,6 @@
 #include "FlightController.h"
 #include "Gps.h"
+#include <iostream>
 #include <string>
 
 FlightController::FlightController(Gps* gps)
@@ -13,8 +14,8 @@ FlightController::FlightController(Gps* gps)
     motor_front_left_bottom_speed = 0;
     motor_front_left_top_speed = 0;
     tilt_servo_angle = 0;
-    elevon_one_angle = 0;
-    elevon_two_angle = 0;
+    elevon_right_angle = 0;
+    elevon_left_angle = 0;
     landing_gear_servo_angle = 0;
     mtx.unlock();
 }
@@ -57,6 +58,23 @@ int FlightController::getTiltAngle()
     return tilt_servo_angle;
 }
 
+int FlightController::getElevonAngle(int idx){
+    if(idx == 0)
+    {
+        return elevon_right_angle;
+    }
+    else if(idx == 1)
+    {
+        return elevon_left_angle;
+    }
+    else
+    {
+        std::cout << "WARNING: No such elevon index: " << std::to_string(idx);
+        return 0;
+    }
+    
+}
+
 void FlightController::updateMotors(TrifanMotorConfig conf)
 {
     mtx.lock();
@@ -81,6 +99,35 @@ void FlightController::updateMotors(int rpm)
     updateMotors(cfg);
 }
 
+// 0 degrees is vertical hover
+// 90 degrees is full forward flight
+void FlightController::tiltProps(int deg)
+{
+    mtx.lock();
+    tilt_servo_angle = deg;
+    mtx.unlock();
+}
+
+// 0 is neutral
+// positive numbers are angled above the wing (climb)
+// negative numbers are angled below the wing (dive)
+void FlightController::setElevons(int deg)
+{
+    mtx.lock();
+    elevon_right_angle = deg;
+    elevon_left_angle = deg;
+    mtx.unlock();
+}
+
+// 0 is gear deployed
+// 90 is gear fully retracted
+void FlightController::setGearSrv(int degrees)
+{
+    mtx.lock();
+    landing_gear_servo_angle = degrees;
+    mtx.unlock();
+}
+
 std::string FlightController::getStatus()
 {
     mtx.lock();
@@ -93,7 +140,7 @@ std::string FlightController::getStatus()
     status = status + " LT: " + std::to_string(motor_front_left_top_speed) + " ]\n";
 
     status = status + "  TILT Srv: " + std::to_string(tilt_servo_angle) + "\n";
-    status = status + "  ELEVONS [ ONE: " + std::to_string(elevon_one_angle) + " TWO: " + std::to_string(elevon_two_angle) + " ]\n";
+    status = status + "  ELEVONS [ Right: " + std::to_string(elevon_right_angle) + " Left: " + std::to_string(elevon_left_angle) + " ]\n";
     status = status + "  GEAR Srv: " + std::to_string(landing_gear_servo_angle) + "\n";
     status = status + "  LOCATION [ LAT: " + std::to_string(gpsPtr->getLatitude());
     status = status + " LNG: " + std::to_string(gpsPtr->getLongitude());
