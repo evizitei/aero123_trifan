@@ -21,6 +21,7 @@ private:
     void simulateHover();
     void simulateForwardFlight();
     void simulateTransitionalFlight();
+    void simulateCoordinateMotion(double lateral_component);
     void logTime();
     void logMessage(std::string message);
 

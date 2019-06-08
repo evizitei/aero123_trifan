@@ -23,6 +23,8 @@ void printHelp()
     std::cout << "  'takeoff'        -> turn motors up to gain hover altitude\n";
     std::cout << "  'land'           -> turn motors down to shed hover altitude\n";
     std::cout << "  'forward_flight' -> flip propellors to 90deg (forward)\n";
+    std::cout << "  'rotors_forward' -> nudge propellors towards forward flight\n";
+    std::cout << "  'rotors_up'      -> nudge propellors towards hover\n";
     std::cout << "  'hover'          -> flip props to 0 (hover) \n";
     std::cout << "  'elvs_up'        -> nudge angle of elevons for climb\n";
     std::cout << "  'elvs_down'      -> nudge angle of elevons for dive\n";
@@ -82,6 +84,14 @@ int main()
         {
             // snap props to forward configuration
             ctrl->tiltProps(90);
+        }
+        else if(flight_command == "rotors_forward")
+        {
+            ctrl->tiltProps(ctrl->getTiltAngle() + 10);
+        }
+        else if(flight_command == "rotors_up")
+        {
+            ctrl->tiltProps(ctrl->getTiltAngle() - 10);
         }
         else if(flight_command == "hover")
         {

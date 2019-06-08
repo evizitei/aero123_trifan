@@ -9,7 +9,7 @@
 #define PI 3.14159265
 
 const int RPM_EQUILLIBRIUM = 3000;
-const int TRANS_POWER_EQUILLIBRIUM = 2000;
+const int TRANS_POWER_EQUILLIBRIUM = 2800;
 const int FF_POWER_EQUILLIBRIUM = 1500;
 
 Simulator::Simulator(FlightController* cPtr, Gps* gpsPtr)
@@ -36,6 +36,9 @@ void Simulator::simulateHover()
         if(rpms > RPM_EQUILLIBRIUM){
             double delta = double((rpms - RPM_EQUILLIBRIUM) / 100);
             gps->updateAltitude(delta);
+        }else{
+            // make sure we don't update the altitude to be below the ground
+            gps->updateAltitude(gps->getAltitude() * -1);
         }
     }
     else
@@ -103,6 +106,39 @@ void Simulator::simulateForwardFlight()
         }
         gps->updateAltitude(delta);
     }
+    simulateCoordinateMotion(lateral_component);
+}
+
+void Simulator::simulateTransitionalFlight()
+{
+    // transitional flight.  compute vector of force based on tilt angle
+    // and update altitude and lateral position accordingly.
+    int rpms = ctrl->getMotorSpeed(0);
+    if(rpms < TRANS_POWER_EQUILLIBRIUM)
+    {
+        // power too low, we're losing altitude no matter what
+        double delta = double((rpms - TRANS_POWER_EQUILLIBRIUM) / 100);
+        gps->updateAltitude(delta);
+        return;
+    }
+    
+    // motors fast enough for powered flight, compute magnitude of vector
+    // LET 2000 RPM == 10.0 m/s, and every 500 RPMs be an additional 2.5 m/s
+    double vector_magnitude = 10.0 + ((double(rpms - TRANS_POWER_EQUILLIBRIUM) / 500.0) * 2.5);
+    // compare with rotor tilt to determine altitude displacement
+    double lateral_component = vector_magnitude;
+    // sin(90 - tilt) = vertical_comp / vector => vertical_comp = sin(90 - tilt) * vector
+    int tilt = ctrl->getTiltAngle();
+    double altitude_component = sin(abs(90 - tilt) * (PI/180)) * vector_magnitude;
+    lateral_component = sqrt((vector_magnitude*vector_magnitude) - (altitude_component*altitude_component));
+    //3.28 feet to meter
+    double delta = altitude_component * 3.28;
+    gps->updateAltitude(delta);
+    simulateCoordinateMotion(lateral_component);
+}
+
+void Simulator::simulateCoordinateMotion(double lateral_component)
+{
     // compute lat/lng components from remaining vector magnitude based on heading
     double heading_rad = heading * (PI / 180);
     double lng_comp = cos(heading_rad);
@@ -123,13 +159,6 @@ void Simulator::simulateForwardFlight()
         std::cout << terrain_warning << "\n";
         logMessage(terrain_warning);
     }
-}
-
-void Simulator::simulateTransitionalFlight()
-{
-    // transitional flight.  compute vector of force based on tilt angle
-    // and update altitude and lateral position accordingly.
-    std::cout << "WARNING: Transitional Flight not yet simulated!";
 }
 
 void Simulator::run()
