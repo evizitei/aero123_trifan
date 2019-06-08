@@ -6,7 +6,7 @@ TESTDIR := test
 BINNAME := trifan
 
 build:
-	$(CC) --std=c++11 -o $(BINDIR)/$(BINNAME) $(SRCDIR)/*.cpp
+	$(CC) -pthread --std=c++11 -o $(BINDIR)/$(BINNAME) $(SRCDIR)/*.cpp
 
 clean:
 	@echo " Cleaning..."; 
@@ -17,7 +17,7 @@ run: build
 	$(BINDIR)/$(BINNAME)
 
 test:
-	$(CC) --std=c++11 -o $(TESTDIR)/bin/system_tests $(TESTDIR)/TrifanTest.cpp \
+	$(CC) -pthread --std=c++11 -o $(TESTDIR)/bin/system_tests $(TESTDIR)/TrifanTest.cpp \
 	  $(SRCDIR)/FlightController.cpp \
 	  $(SRCDIR)/FlightLog.cpp \
 	  $(SRCDIR)/Gps.cpp \

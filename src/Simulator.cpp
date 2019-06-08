@@ -9,6 +9,7 @@
 #define PI 3.14159265
 
 const int RPM_EQUILLIBRIUM = 3000;
+const int TRANS_POWER_EQUILLIBRIUM = 2000;
 const int FF_POWER_EQUILLIBRIUM = 1500;
 
 Simulator::Simulator(FlightController* cPtr, Gps* gpsPtr)
@@ -128,7 +129,6 @@ void Simulator::simulateTransitionalFlight()
 {
     // transitional flight.  compute vector of force based on tilt angle
     // and update altitude and lateral position accordingly.
-    // *TODO*
     std::cout << "WARNING: Transitional Flight not yet simulated!";
 }
 

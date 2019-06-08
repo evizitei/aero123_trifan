@@ -18,20 +18,20 @@ void printHelp()
 {
     std::cout << "************ TRIFAN HELP *************** \n";
     std::cout << "Command Options: \n";
-    std::cout << "  'help'          -> print this message \n";
-    std::cout << "  'shutdown'      -> kill the program \n";
-    std::cout << "  'takeoff'       -> turn motors up to gain hover altitude\n";
-    std::cout << "  'land'          -> turn motors down to shed hover altitude\n";
-    std::cout << "  'forward_flight -> flip propellors to 90deg (forward)\n";
-    std::cout << "  'hover          -> flip props to 0 (hover) \n";
-    std::cout << "  'elvs_up        -> nudge angle of elevons for climb\n";
-    std::cout << "  'elvs_down      -> nudge angle of elevons for dive\n";
-    std::cout << "  'elvs_level     -> snap elevons to neutral\n";
-    std::cout << "  'throttle_up    -> turn motors up by 250 RPM\n";
-    std::cout << "  'throttle_down  -> turn motors down by 250 RPM\n";
-    std::cout << "  'gear_up        -> stow landing gear\n";
-    std::cout << "  'gear_down      -> deploy landing gear\n";
-    std::cout << "  'status'        -> print flight log current entry\n";
+    std::cout << "  'help'           -> print this message \n";
+    std::cout << "  'shutdown'       -> kill the program \n";
+    std::cout << "  'takeoff'        -> turn motors up to gain hover altitude\n";
+    std::cout << "  'land'           -> turn motors down to shed hover altitude\n";
+    std::cout << "  'forward_flight' -> flip propellors to 90deg (forward)\n";
+    std::cout << "  'hover'          -> flip props to 0 (hover) \n";
+    std::cout << "  'elvs_up'        -> nudge angle of elevons for climb\n";
+    std::cout << "  'elvs_down'      -> nudge angle of elevons for dive\n";
+    std::cout << "  'elvs_level'     -> snap elevons to neutral\n";
+    std::cout << "  'throttle_up'    -> turn motors up by 250 RPM\n";
+    std::cout << "  'throttle_down'  -> turn motors down by 250 RPM\n";
+    std::cout << "  'gear_up'        -> stow landing gear\n";
+    std::cout << "  'gear_down'      -> deploy landing gear\n";
+    std::cout << "  'status'         -> print flight log current entry\n";
     std::cout << "**************************************** \n\n\n";
 }
 
