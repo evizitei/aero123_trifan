@@ -76,9 +76,21 @@ int main()
         }
         else if(flight_command == "land")
         {
-            // need handling for what if in transitional or forward flight,
-            // just turning the motors down is insufficient to land.
-            ctrl->updateMotors(2500);
+            //Were you thinking something like this?  It gets the job done.
+            if(ctrl->getTiltAngle() == 0)
+            {
+                std::cout << "Landing...\n";
+                while(gps->getAltitude() >50.0)
+                    ctrl->updateMotors(2500);
+                while(gps->getAltitude() >25.0)
+                    ctrl->updateMotors(2750);
+                while(gps->getAltitude() >0.0)
+                    ctrl->updateMotors(2900);
+                ctrl->updateMotors(3000);
+            }
+            else
+                std::cout << "Please return to hover, before attempting to land. \n";
+
         }
         else if(flight_command == "forward_flight")
         {
