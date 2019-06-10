@@ -73,6 +73,23 @@ int main()
             // probably should check arm/disarm here and abort if
             // disarmed
             ctrl->updateMotors(3500);
+            // if commanded to end takeoff, set motors to equillibrium
+            std::string takeoff_command;
+            while(true)
+            {
+              std::cout << "Enter 'end' to end takeoff operation.\n";
+              std::getline(std::cin, takeoff_command);
+              if (takeoff_command == "end")
+              {
+                ctrl->updateMotors(3000);
+                std::cout << "Takeoff operation complete.\n";
+                break;
+              }
+              else
+              {
+                std::cout << "Invalid command.\n";
+              }
+            }
         }
         else if(flight_command == "land")
         {
@@ -140,7 +157,7 @@ int main()
             std::cout << "NO SUCH COMMAND!! " << flight_command << "\n\n";
             printHelp();
         }
-        
+
     }
     fLog->signalStop();
     sim->signalStop();
