@@ -4,6 +4,7 @@
 #include "Simulator.h"
 #include <iostream>
 #include <string>
+#include <chrono>
 #include <thread>
 
 void loggerThread(FlightLog* fPtr){
@@ -76,16 +77,39 @@ int main()
         }
         else if(flight_command == "land")
         {
-            //Were you thinking something like this?  It gets the job done.
-            if(ctrl->getTiltAngle() == 0)
+            if(ctrl->getTiltAngle() == 0) //checks to see if the dron is in hover
             {
+                double descent_time[3] = {0.0, 15000.0, 20000.0};
+
+
+                if(gps->getAltitude() >50.0) //if drone is currently over 50 units in altitude
+                    descent_time[0] = (gps->getAltitude()-50)/5 * 1000; //I'm checking to see if I could just calc time to land.
+                    
+                if(gps->getAltitude() <=50.0 && gps->getAltitude() > 20.0) //if drone is currently between 50 and 20 units
+                    descent_time[1] = (gps->getAltitude()-20)/2 * 1000;
+                
+                if(gps->getAltitude() >0.0 && gps->getAltitude() <= 20) //if drone is below 20 units but not on the ground
+                {
+                    descent_time[2] = gps->getAltitude() * 1000;
+                    descent_time[1] = 0.0;
+                }
+
                 std::cout << "Landing...\n";
-                while(gps->getAltitude() >50.0)
-                    ctrl->updateMotors(2500);
-                while(gps->getAltitude() >25.0)
-                    ctrl->updateMotors(2750);
-                while(gps->getAltitude() >0.0)
+
+                ctrl->updateMotors(2500);
+                std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(descent_time[0])));
+                ctrl->updateMotors(2750);
+                std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(descent_time[1])));
+                ctrl->updateMotors(2900);
+                std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(descent_time[2])));
+
+                if(gps->getAltitude()>0.0)
+                {
                     ctrl->updateMotors(2900);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                }
+
+                std::cout << "Landed. \n";
                 ctrl->updateMotors(3000);
             }
             else
