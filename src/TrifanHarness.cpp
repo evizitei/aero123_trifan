@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <regex>
 
 void loggerThread(FlightLog* fPtr){
     fPtr->run();
@@ -18,22 +19,22 @@ void printHelp()
 {
     std::cout << "************ TRIFAN HELP *************** \n";
     std::cout << "Command Options: \n";
-    std::cout << "  'help'           -> print this message \n";
-    std::cout << "  'shutdown'       -> kill the program \n";
-    std::cout << "  'takeoff'        -> turn motors up to gain hover altitude\n";
-    std::cout << "  'land'           -> turn motors down to shed hover altitude\n";
-    std::cout << "  'forward_flight' -> flip propellors to 90deg (forward)\n";
-    std::cout << "  'rotors_forward' -> nudge propellors towards forward flight\n";
-    std::cout << "  'rotors_up'      -> nudge propellors towards hover\n";
-    std::cout << "  'hover'          -> flip props to 0 (hover) \n";
-    std::cout << "  'elvs_up'        -> nudge angle of elevons for climb\n";
-    std::cout << "  'elvs_down'      -> nudge angle of elevons for dive\n";
-    std::cout << "  'elvs_level'     -> snap elevons to neutral\n";
-    std::cout << "  'throttle_up'    -> turn motors up by 250 RPM\n";
-    std::cout << "  'throttle_down'  -> turn motors down by 250 RPM\n";
-    std::cout << "  'gear_up'        -> stow landing gear\n";
-    std::cout << "  'gear_down'      -> deploy landing gear\n";
-    std::cout << "  'status'         -> print flight log current entry\n";
+    std::cout << "  'help'                      -> print this message \n";
+    std::cout << "  'shutdown'                  -> kill the program \n";
+    std::cout << "  'takeoff [altitude]'        -> turn motors up to gain hover altitude\n";
+    std::cout << "  'land'                      -> turn motors down to shed hover altitude\n";
+    std::cout << "  'forward_flight'            -> flip propellors to 90deg (forward)\n";
+    std::cout << "  'rotors_forward'            -> nudge propellors towards forward flight\n";
+    std::cout << "  'rotors_up'                 -> nudge propellors towards hover\n";
+    std::cout << "  'hover'                     -> flip props to 0 (hover) \n";
+    std::cout << "  'elvs_up'                   -> nudge angle of elevons for climb\n";
+    std::cout << "  'elvs_down'                 -> nudge angle of elevons for dive\n";
+    std::cout << "  'elvs_level'                -> snap elevons to neutral\n";
+    std::cout << "  'throttle_up'               -> turn motors up by 250 RPM\n";
+    std::cout << "  'throttle_down'             -> turn motors down by 250 RPM\n";
+    std::cout << "  'gear_up'                   -> stow landing gear\n";
+    std::cout << "  'gear_down'                 -> deploy landing gear\n";
+    std::cout << "  'status'                    -> print flight log current entry\n";
     std::cout << "**************************************** \n\n\n";
 }
 
@@ -68,27 +69,21 @@ int main()
         {
             printHelp();
         }
-        else if(flight_command == "takeoff")
+        else if(flight_command.substr(0, 8) == "takeoff ")
         {
             // probably should check arm/disarm here and abort if
             // disarmed
-            ctrl->updateMotors(3500);
-            // if commanded to end takeoff, set motors to equillibrium
-            std::string takeoff_command;
-            while(true)
+            // parse the takeoff altitude parameter and convert to double
+            std::regex r("\\b\\d+");
+            std::smatch match;
+            if (std::regex_search(flight_command, match, r) == true)
             {
-              std::cout << "Enter 'end' to end takeoff operation.\n";
-              std::getline(std::cin, takeoff_command);
-              if (takeoff_command == "end")
-              {
-                ctrl->updateMotors(3000);
-                std::cout << "Takeoff operation complete.\n";
-                break;
-              }
-              else
-              {
-                std::cout << "Invalid command.\n";
-              }
+              std::string alt_param_str = match.str(0);
+              double alt_param = std::stod(alt_param_str);
+              // set takeoff altitude
+              ctrl->setTakeoffAlt(alt_param);
+              // increase motor speed to gain altitude
+              ctrl->updateMotors(3500);
             }
         }
         else if(flight_command == "land")

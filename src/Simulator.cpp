@@ -46,11 +46,17 @@ void Simulator::simulateHover()
         // completely made up magnitude, but it will go in the right direction
         gps->updateAltitude(double((rpms - RPM_EQUILLIBRIUM) / 100));
     }
+
+    // if we've reached the target takeoff altitude, return to equilibrium
+    if (ctrl->getTakeoffAlt() == gps->getAltitude())
+    {
+      ctrl->updateMotors(RPM_EQUILLIBRIUM);
+    }
 }
 
 void Simulator::simulateForwardFlight()
 {
-    // we're in full forward flight, compute forward position change 
+    // we're in full forward flight, compute forward position change
     // and use elevon angle for altitude (approximate)
     //
     // 1) check elevons, adjust angle of attack
@@ -121,7 +127,7 @@ void Simulator::simulateTransitionalFlight()
         gps->updateAltitude(delta);
         return;
     }
-    
+
     // motors fast enough for powered flight, compute magnitude of vector
     // LET 2000 RPM == 10.0 m/s, and every 500 RPMs be an additional 2.5 m/s
     double vector_magnitude = 10.0 + ((double(rpms - TRANS_POWER_EQUILLIBRIUM) / 500.0) * 2.5);
