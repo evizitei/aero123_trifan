@@ -51,7 +51,9 @@ If you'd like an editor amenable to this kind of process, consider installing
 You'll need to install (cygwin)[https://cygwin.com/install.html], and while installing you need to
 make sure you select the packages
 
-`make`,`git`, and  `gcc-g++` from cygwins package selections.
+`make`,`git`, `gcc-core` and  `gcc-g++` from cygwins package selections.
+
+YOU MUST MAKE SURE gcc-core AND gcc-g++ ARE THE SAME VERSION!
 
 1) Open cygwin, you should get a terminal.
 
