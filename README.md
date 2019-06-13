@@ -81,7 +81,7 @@ github:
 
 5) change into the root of that directory and make sure you can build:
 
-`cd aero123_trifan.git`
+`cd aero123_trifan`
 
 `make build`
 
