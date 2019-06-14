@@ -270,7 +270,7 @@ void FlightController::transFromForwardStep()
         }else{
             tilt_servo_angle = tilt_servo_angle - 5;
         }
-        lockedUpdateMotors(motor_back_bottom_speed - 50);
+        lockedUpdateMotors(motor_back_bottom_speed + 50);
     } else {
         lockedUpdateMotors(TRANS_POWER_EQUILLIBRIUM);
         state = "transitional_flight";
@@ -287,7 +287,7 @@ void FlightController::transToHoverStep()
         }else{
             tilt_servo_angle = tilt_servo_angle - 5;
         }
-        lockedUpdateMotors(motor_back_bottom_speed + 100);
+        lockedUpdateMotors(motor_back_bottom_speed + 50);
     } else {
         lockedUpdateMotors(RPM_EQUILLIBRIUM);
         state = "hover";
@@ -304,7 +304,7 @@ void FlightController::transToForwardStep()
         }else{
             tilt_servo_angle = tilt_servo_angle + 5;
         }
-        lockedUpdateMotors(motor_back_bottom_speed - 100);
+        lockedUpdateMotors(motor_back_bottom_speed - 50);
     } else {
         lockedUpdateMotors(FF_POWER_EQUILLIBRIUM);
         state = "flying_forward";
