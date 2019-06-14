@@ -4,6 +4,7 @@
 #include "Simulator.h"
 #include <iostream>
 #include <string>
+#include <chrono>
 #include <thread>
 
 void loggerThread(FlightLog* fPtr){
@@ -76,9 +77,37 @@ int main()
         }
         else if(flight_command == "land")
         {
-            // need handling for what if in transitional or forward flight,
-            // just turning the motors down is insufficient to land.
-            ctrl->updateMotors(2500);
+            if(ctrl->getTiltAngle() == 0) //checks to see if the dron is in hover
+            {
+                // So a thought occurs that at different levels of wind and such these values wouldn't always work.
+                // 2500 might keep you at the same altitude as there is an updraft.
+                // the comments "stable - ###" is the values off the motor speed that would allow for descent
+
+                std::cout << "Landing...\n";
+
+                while(gps->getAltitude()>0.0)
+                {
+                    std::cout << "Current Altitude: " << gps->getAltitude() << " \n"; //this isn't printing
+
+                    if(gps->getAltitude() >50.0)                                //if drone is currently over 50 units in altitude
+                        ctrl->updateMotors(2500); 
+                        // stable - 500 OR 0.8333 of stable 
+                    if(gps->getAltitude() <=50.0 && gps->getAltitude() > 20.0)  //if drone is currently between 50 and 20 units
+                        ctrl->updateMotors(2750); 
+                        // stable - 250 OR 0.9167 of stable
+                    if(gps->getAltitude() >0.0 && gps->getAltitude() <= 20)     //if drone is below 20 units but not on the ground
+                        ctrl->updateMotors(2900); 
+                        // stable - 100 OR 0.9667 of stable
+
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                }
+
+                std::cout << "Landed. \n";
+                ctrl->updateMotors(3000);
+            }
+            else
+                std::cout << "Please return to hover, before attempting to land. \n";
+
         }
         else if(flight_command == "forward_flight")
         {
