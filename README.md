@@ -100,10 +100,11 @@ To execute the flight controller, you can use
 `make run`
 
 which will re-build the binary and run it.
-Three threads will be started, one to accept
+Four threads will be started: one to accept
 command input, one to run the simulator
 for feeding position changes into the GPS,
- and one to log the status of the
+one for processing state changes and decisions in
+the flight controller, and one to log the status of the
 system to the flight log on disk.
 
 The CLI will provide you with commands you can use to "control"

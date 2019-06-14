@@ -15,11 +15,17 @@ void simThread(Simulator* sim){
     sim->run();
 }
 
+void ctrlThread(FlightController* fCtrl){
+    fCtrl->run();
+}
+
 void printHelp()
 {
     std::cout << "************ TRIFAN HELP *************** \n";
     std::cout << "Command Options: \n";
     std::cout << "  'help'           -> print this message \n";
+    std::cout << "  'arm'            -> turn motors on to idle \n";
+    std::cout << "  'disarm'         -> turn motors off \n";
     std::cout << "  'shutdown'       -> kill the program \n";
     std::cout << "  'takeoff'        -> turn motors up to gain hover altitude\n";
     std::cout << "  'land'           -> turn motors down to shed hover altitude\n";
@@ -56,6 +62,9 @@ int main()
     // this one updates the GPS position from the
     // flight configuration (approximately)
     std::thread st(simThread, sim);
+    // this thread manages state transitions
+    // and feedback loops within the controller itself.
+    std::thread ct(ctrlThread, ctrl);
     while(true) {
         std::cout << "Input command...\n";
         std::getline(std::cin, flight_command);
@@ -69,6 +78,26 @@ int main()
         {
             printHelp();
         }
+        else if(flight_command == "arm")
+        {
+            std::string cur_state = ctrl->getState();
+            if(cur_state == "off" || cur_state == "disarmed"){
+                ctrl->setState("arming", 500);
+            }else{
+                std::cout << "Unable to arm in this state...\n";
+                std::cout << ctrl->getStatus();
+            }
+        }
+        else if(flight_command == "disarm")
+        {
+            std::string cur_state = ctrl->getState();
+            if(cur_state == "armed" || cur_state == "landed"){
+                ctrl->setState("disarming", 0);
+            }else{
+                std::cout << "Unable to disarm in this state...\n";
+                std::cout << ctrl->getStatus();
+            }
+        }
         else if(flight_command == "takeoff")
         {
             // probably should check arm/disarm here and abort if
@@ -77,37 +106,13 @@ int main()
         }
         else if(flight_command == "land")
         {
-            if(ctrl->getTiltAngle() == 0) //checks to see if the dron is in hover
+            if(ctrl->getTiltAngle() == 0) //checks to see if the drone is in hover
             {
-                // So a thought occurs that at different levels of wind and such these values wouldn't always work.
-                // 2500 might keep you at the same altitude as there is an updraft.
-                // the comments "stable - ###" is the values off the motor speed that would allow for descent
-
-                std::cout << "Landing...\n";
-
-                while(gps->getAltitude()>0.0)
-                {
-                    std::cout << "Current Altitude: " << gps->getAltitude() << " \n"; //this isn't printing
-
-                    if(gps->getAltitude() >50.0)                                //if drone is currently over 50 units in altitude
-                        ctrl->updateMotors(2500); 
-                        // stable - 500 OR 0.8333 of stable 
-                    if(gps->getAltitude() <=50.0 && gps->getAltitude() > 20.0)  //if drone is currently between 50 and 20 units
-                        ctrl->updateMotors(2750); 
-                        // stable - 250 OR 0.9167 of stable
-                    if(gps->getAltitude() >0.0 && gps->getAltitude() <= 20)     //if drone is below 20 units but not on the ground
-                        ctrl->updateMotors(2900); 
-                        // stable - 100 OR 0.9667 of stable
-
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                }
-
-                std::cout << "Landed. \n";
-                ctrl->updateMotors(3000);
+                ctrl->setState("landing", 0);
             }
-            else
+            else{
                 std::cout << "Please return to hover, before attempting to land. \n";
-
+            }
         }
         else if(flight_command == "forward_flight")
         {
@@ -173,8 +178,11 @@ int main()
     }
     fLog->signalStop();
     sim->signalStop();
+    ctrl->signalStop();
     lt.join();
     st.join();
+    ct.join();
     delete ctrl;
+    std::cout << "Safe shutdown complete.  Exiting. \n\n\n";
     return 0;
 }

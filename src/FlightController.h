@@ -34,18 +34,29 @@ private:
     int elevon_right_angle;
     int elevon_left_angle;
     int landing_gear_servo_angle;
+    std::string state;
+    int state_threshold;
     std::mutex mtx;
+    void landingStep();
+    void armingStep();
+    void disarmingStep();
+    void lockedMotorUpdate(TrifanMotorConfig conf);
+    void lockedUpdateMotors(int rpm);
 
 public:
     FlightController(Gps* gps);
     int getMotorSpeed(int motorIndex);
     int getTiltAngle();
     int getElevonAngle(int elevonIndex);
+    std::string getState();
     void updateMotors(TrifanMotorConfig conf);
     void updateMotors(int rpm);
     void setGearSrv(int degrees);
     void tiltProps(int degrees);
     void setElevons(int angle);
     std::string getStatus();
+    void run();
+    void setState(std::string state_string, int threshold);
+    void signalStop();
 };
 
