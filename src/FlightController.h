@@ -34,6 +34,7 @@ private:
     int elevon_right_angle;
     int elevon_left_angle;
     int landing_gear_servo_angle;
+    double takeoff_alt;
     std::mutex mtx;
 
 public:
@@ -41,11 +42,12 @@ public:
     int getMotorSpeed(int motorIndex);
     int getTiltAngle();
     int getElevonAngle(int elevonIndex);
+    double getTakeoffAlt();
     void updateMotors(TrifanMotorConfig conf);
     void updateMotors(int rpm);
     void setGearSrv(int degrees);
     void tiltProps(int degrees);
     void setElevons(int angle);
+    void setTakeoffAlt(double alt);
     std::string getStatus();
 };
-

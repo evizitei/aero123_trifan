@@ -17,6 +17,7 @@ FlightController::FlightController(Gps* gps)
     elevon_right_angle = 0;
     elevon_left_angle = 0;
     landing_gear_servo_angle = 0;
+    takeoff_alt = 0.0;
     mtx.unlock();
 }
 
@@ -72,7 +73,7 @@ int FlightController::getElevonAngle(int idx){
         std::cout << "WARNING: No such elevon index: " << std::to_string(idx);
         return 0;
     }
-    
+
 }
 
 void FlightController::updateMotors(TrifanMotorConfig conf)
@@ -85,6 +86,11 @@ void FlightController::updateMotors(TrifanMotorConfig conf)
     motor_front_left_bottom_speed = conf.left_prop.bottom_speed;
     motor_front_left_top_speed = conf.left_prop.top_speed;
     mtx.unlock();
+}
+
+double FlightController::getTakeoffAlt()
+{
+  return takeoff_alt;
 }
 
 // Convenience method when you want to set all motors to the same
@@ -126,6 +132,13 @@ void FlightController::setGearSrv(int degrees)
     mtx.lock();
     landing_gear_servo_angle = degrees;
     mtx.unlock();
+}
+
+void FlightController::setTakeoffAlt(double alt)
+{
+  mtx.lock();
+  takeoff_alt = alt;
+  mtx.unlock();
 }
 
 std::string FlightController::getStatus()
