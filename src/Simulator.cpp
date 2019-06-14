@@ -9,7 +9,7 @@
 #define PI 3.14159265
 
 const int RPM_EQUILLIBRIUM = 3000;
-const int TRANS_POWER_EQUILLIBRIUM = 2800;
+const int TRANS_POWER_EQUILLIBRIUM = 2600;
 const int FF_POWER_EQUILLIBRIUM = 1500;
 
 Simulator::Simulator(FlightController* cPtr, Gps* gpsPtr)
@@ -64,18 +64,19 @@ void Simulator::simulateForwardFlight()
     }
     mtx.unlock();
 
+    bool altShortCircuited = false;
     if(aoa > 55.0)
     {
         // Angle of Attack is too high, stall
         double delta = -25.0;
         gps->updateAltitude(delta);
-        return;
+        altShortCircuited = true;
     }else if (aoa < -55.0)
     {
         // Angle of Attack is too steep, dive
         double delta = -50.0;
         gps->updateAltitude(delta);
-        return;
+        altShortCircuited = true;
     }
 
     // AOA is stable
@@ -86,7 +87,7 @@ void Simulator::simulateForwardFlight()
         // power too low, we're losing altitude no matter what
         double delta = double((rpms - FF_POWER_EQUILLIBRIUM) / 100);
         gps->updateAltitude(delta);
-        return;
+        altShortCircuited = true;
     }
     // motors fast enough for powered flight, compute magnitude of vector
     // LET 1500 RPM == 10.0 m/s, and every 500 RPMs be an additional 2.5 m/s
@@ -104,7 +105,8 @@ void Simulator::simulateForwardFlight()
         {
             delta = delta * -1.0;
         }
-        gps->updateAltitude(delta);
+        if(!altShortCircuited)
+            gps->updateAltitude(delta);
     }
     simulateCoordinateMotion(lateral_component);
 }
@@ -114,12 +116,13 @@ void Simulator::simulateTransitionalFlight()
     // transitional flight.  compute vector of force based on tilt angle
     // and update altitude and lateral position accordingly.
     int rpms = ctrl->getMotorSpeed(0);
+    bool altShortCircuited = false;
     if(rpms < TRANS_POWER_EQUILLIBRIUM)
     {
         // power too low, we're losing altitude no matter what
         double delta = double((rpms - TRANS_POWER_EQUILLIBRIUM) / 100);
         gps->updateAltitude(delta);
-        return;
+        altShortCircuited = true;
     }
     
     // motors fast enough for powered flight, compute magnitude of vector
@@ -130,10 +133,13 @@ void Simulator::simulateTransitionalFlight()
     // sin(90 - tilt) = vertical_comp / vector => vertical_comp = sin(90 - tilt) * vector
     int tilt = ctrl->getTiltAngle();
     double altitude_component = sin(abs(90 - tilt) * (PI/180)) * vector_magnitude;
+    double weight_factor = 6.5;
+    altitude_component = altitude_component - weight_factor;
     lateral_component = sqrt((vector_magnitude*vector_magnitude) - (altitude_component*altitude_component));
     //3.28 feet to meter
     double delta = altitude_component * 3.28;
-    gps->updateAltitude(delta);
+    if(!altShortCircuited)
+        gps->updateAltitude(delta);
     simulateCoordinateMotion(lateral_component);
 }
 

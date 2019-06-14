@@ -185,11 +185,11 @@ void FlightController::landingStep()
     mtx.lock();
     double altitude = gpsPtr->getAltitude();
     if(altitude >50.0){                                //if drone is currently over 50 units in altitude
-        lockedUpdateMotors(RPM_EQUILLIBRIUM - 1500); 
+        lockedUpdateMotors(RPM_EQUILLIBRIUM - 1800); 
     }else if(altitude > 20.0){  //if drone is currently between 50 and 20 units
-        lockedUpdateMotors(RPM_EQUILLIBRIUM - 1000);  // stable - 250 OR 0.9167 of stable
+        lockedUpdateMotors(RPM_EQUILLIBRIUM - 1400);  // stable - 250 OR 0.9167 of stable
     }else if(altitude >0.0 && altitude <= 20){     //if drone is below 20 units but not on the ground
-        lockedUpdateMotors(RPM_EQUILLIBRIUM - 500); 
+        lockedUpdateMotors(RPM_EQUILLIBRIUM - 700); 
     }else if(altitude <= 0.0){
         state = "landed";
         state_threshold = 0;
@@ -231,11 +231,11 @@ void FlightController::hoverClimbStep()
         } else if((state_threshold - curAlt) > 300) {
             lockedUpdateMotors(motor_front_right_bottom_speed + 200);
         }else if((state_threshold - curAlt) > 150){
-            lockedUpdateMotors(RPM_EQUILLIBRIUM + 1000);
+            lockedUpdateMotors(RPM_EQUILLIBRIUM + 1500);
         }else if((state_threshold - curAlt) > 50){
-            lockedUpdateMotors(RPM_EQUILLIBRIUM + 750);
+            lockedUpdateMotors(RPM_EQUILLIBRIUM + 1000);
         }else if((state_threshold - curAlt) < 25){
-            lockedUpdateMotors(RPM_EQUILLIBRIUM + 250);
+            lockedUpdateMotors(RPM_EQUILLIBRIUM + 500);
         }
     }else if(curAlt >= state_threshold){
         lockedUpdateMotors(RPM_EQUILLIBRIUM);
@@ -253,7 +253,7 @@ void FlightController::transFromHoverStep()
         }else{
             tilt_servo_angle = tilt_servo_angle + 5;
         }
-        lockedUpdateMotors(motor_back_bottom_speed + 100);
+        lockedUpdateMotors(motor_back_bottom_speed - 50);
     } else {
         lockedUpdateMotors(TRANS_POWER_EQUILLIBRIUM);
         state = "transitional_flight";
@@ -270,7 +270,7 @@ void FlightController::transFromForwardStep()
         }else{
             tilt_servo_angle = tilt_servo_angle - 5;
         }
-        lockedUpdateMotors(motor_back_bottom_speed - 100);
+        lockedUpdateMotors(motor_back_bottom_speed - 50);
     } else {
         lockedUpdateMotors(TRANS_POWER_EQUILLIBRIUM);
         state = "transitional_flight";
