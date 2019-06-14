@@ -41,6 +41,10 @@ private:
     void armingStep();
     void disarmingStep();
     void hoverClimbStep();
+    void transFromHoverStep();
+    void transFromForwardStep();
+    void transToHoverStep();
+    void transToForwardStep();
     void lockedMotorUpdate(TrifanMotorConfig conf);
     void lockedUpdateMotors(int rpm);
 
@@ -57,6 +61,7 @@ public:
     void setElevons(int angle);
     std::string getStatus();
     void run();
+    bool processStep();
     void setState(std::string state_string, int threshold);
     void signalStop();
 };

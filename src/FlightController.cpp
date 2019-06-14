@@ -5,6 +5,8 @@
 #include <string>
 
 const int RPM_EQUILLIBRIUM = 3000;
+const int TRANS_POWER_EQUILLIBRIUM = 2600;
+const int FF_POWER_EQUILLIBRIUM = 1500;
 
 FlightController::FlightController(Gps* gps)
 {
@@ -183,11 +185,11 @@ void FlightController::landingStep()
     mtx.lock();
     double altitude = gpsPtr->getAltitude();
     if(altitude >50.0){                                //if drone is currently over 50 units in altitude
-        lockedUpdateMotors(RPM_EQUILLIBRIUM - 800); // stable - 500 OR 0.8333 of stable 
+        lockedUpdateMotors(RPM_EQUILLIBRIUM - 1500); 
     }else if(altitude > 20.0){  //if drone is currently between 50 and 20 units
-        lockedUpdateMotors(RPM_EQUILLIBRIUM - 400);  // stable - 250 OR 0.9167 of stable
+        lockedUpdateMotors(RPM_EQUILLIBRIUM - 1000);  // stable - 250 OR 0.9167 of stable
     }else if(altitude >0.0 && altitude <= 20){     //if drone is below 20 units but not on the ground
-        lockedUpdateMotors(RPM_EQUILLIBRIUM - 100); 
+        lockedUpdateMotors(RPM_EQUILLIBRIUM - 500); 
     }else if(altitude <= 0.0){
         state = "landed";
         state_threshold = 0;
@@ -231,9 +233,9 @@ void FlightController::hoverClimbStep()
         }else if((state_threshold - curAlt) > 150){
             lockedUpdateMotors(RPM_EQUILLIBRIUM + 1000);
         }else if((state_threshold - curAlt) > 50){
-            lockedUpdateMotors(RPM_EQUILLIBRIUM + 500);
+            lockedUpdateMotors(RPM_EQUILLIBRIUM + 750);
         }else if((state_threshold - curAlt) < 25){
-            lockedUpdateMotors(RPM_EQUILLIBRIUM + 100);
+            lockedUpdateMotors(RPM_EQUILLIBRIUM + 250);
         }
     }else if(curAlt >= state_threshold){
         lockedUpdateMotors(RPM_EQUILLIBRIUM);
@@ -242,23 +244,107 @@ void FlightController::hoverClimbStep()
     mtx.unlock();
 }
 
+void FlightController::transFromHoverStep()
+{
+    mtx.lock();
+    if(tilt_servo_angle < state_threshold){
+        if((state_threshold - tilt_servo_angle) < 5){
+            tilt_servo_angle = state_threshold;
+        }else{
+            tilt_servo_angle = tilt_servo_angle + 5;
+        }
+        lockedUpdateMotors(motor_back_bottom_speed + 100);
+    } else {
+        lockedUpdateMotors(TRANS_POWER_EQUILLIBRIUM);
+        state = "transitional_flight";
+    }
+    mtx.unlock();
+}
+
+void FlightController::transFromForwardStep()
+{
+     mtx.lock();
+    if(tilt_servo_angle > state_threshold){
+        if((tilt_servo_angle - state_threshold) < 5){
+            tilt_servo_angle = state_threshold;
+        }else{
+            tilt_servo_angle = tilt_servo_angle - 5;
+        }
+        lockedUpdateMotors(motor_back_bottom_speed - 100);
+    } else {
+        lockedUpdateMotors(TRANS_POWER_EQUILLIBRIUM);
+        state = "transitional_flight";
+    }
+    mtx.unlock();
+}
+
+void FlightController::transToHoverStep()
+{
+    mtx.lock();
+    if(tilt_servo_angle > 0){
+        if((tilt_servo_angle) < 5){
+            tilt_servo_angle = 0;
+        }else{
+            tilt_servo_angle = tilt_servo_angle - 5;
+        }
+        lockedUpdateMotors(motor_back_bottom_speed + 100);
+    } else {
+        lockedUpdateMotors(RPM_EQUILLIBRIUM);
+        state = "hover";
+    }
+    mtx.unlock();
+}
+
+void FlightController::transToForwardStep()
+{
+    mtx.lock();
+    if(tilt_servo_angle < 90){
+        if(tilt_servo_angle > 85){
+            tilt_servo_angle = 90;
+        }else{
+            tilt_servo_angle = tilt_servo_angle + 5;
+        }
+        lockedUpdateMotors(motor_back_bottom_speed - 100);
+    } else {
+        lockedUpdateMotors(FF_POWER_EQUILLIBRIUM);
+        state = "flying_forward";
+    }
+    mtx.unlock();
+}
+
+bool FlightController::processStep()
+{
+    if (state == "landing"){
+        landingStep();
+    } else if (state == "arming"){
+        armingStep();
+    } else if (state == "disarming"){
+        disarmingStep();
+    } else if (state == "hover_climbing"){
+        hoverClimbStep();
+    } else if (state == "transitioning_from_hover"){
+        transFromHoverStep();
+    } else if (state == "transitioning_from_ff"){
+        transFromForwardStep();
+    } else if (state == "transitioning_to_hover"){
+        transToHoverStep();
+    } else if (state == "transitioning_to_forward"){
+        transToForwardStep();
+    } else if(state == "shutdown"){
+        return true;
+    }
+    // other states require no action in this thread
+    return false;
+}
+
 void FlightController::run()
 {
     int ctrlInterval = 1;
     while (true){
         std::this_thread::sleep_for(std::chrono::milliseconds(ctrlInterval * 1000));
-        if (state == "landing"){
-            landingStep();
-        } else if (state == "arming"){
-            armingStep();
-        } else if (state == "disarming"){
-            disarmingStep();
-        } else if (state == "hover_climbing"){
-            hoverClimbStep();
-        } else if(state == "shutdown"){
+        bool shouldAbort = processStep();
+        if(shouldAbort)
             break;
-        }
-        // other states require no action in this thread
     }
 }
 

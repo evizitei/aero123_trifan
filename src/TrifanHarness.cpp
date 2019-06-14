@@ -30,10 +30,11 @@ void printHelp()
     std::cout << "  'shutdown'       -> kill the program \n";
     std::cout << "  'takeoff [alt]'  -> turn motors up to gain hover altitude\n";
     std::cout << "  'land'           -> turn motors down to shed hover altitude\n";
-    std::cout << "  'forward_flight' -> flip propellors to 90deg (forward)\n";
+    std::cout << "  'trans_flight'   -> gently transition to 45 degree flight\n"; 
+    std::cout << "  'forward_flight' -> transition propellors to 90deg (forward)\n";
+    std::cout << "  'hover'          -> transition props to 0 (hover) \n";
     std::cout << "  'rotors_forward' -> nudge propellors towards forward flight\n";
     std::cout << "  'rotors_up'      -> nudge propellors towards hover\n";
-    std::cout << "  'hover'          -> flip props to 0 (hover) \n";
     std::cout << "  'elvs_up'        -> nudge angle of elevons for climb\n";
     std::cout << "  'elvs_down'      -> nudge angle of elevons for dive\n";
     std::cout << "  'elvs_level'     -> snap elevons to neutral\n";
@@ -78,10 +79,10 @@ bool carryOutCommand(FlightController* ctrl, Simulator* sim, std::string flight_
         }
         std::string alt_param_str = match.str(0);
         int alt_param = std::stod(alt_param_str);
-        if(ctrl->getState() == "armed"){
+        if(ctrl->getState() == "armed" || ctrl->getState() == "landed"){
             ctrl->setState("hover_climbing", alt_param);
         }else{
-            std::cout << "ERROR STATE: Unable to takeoff in this state...\n";
+            std::cout << "ERROR STATE: Unable to takeoff in this state, must be in armed or landed state...\n";
             std::cout << ctrl->getStatus();
         }
     } else if(flight_command == "land") {
@@ -90,16 +91,32 @@ bool carryOutCommand(FlightController* ctrl, Simulator* sim, std::string flight_
         } else {
             std::cout << "Please return to hover, before attempting to land. \n";
         }
+    } else if(flight_command == "trans_flight") {
+        std::string cur_state = ctrl->getState();
+        if(cur_state == "hover"){
+            ctrl->setState("transitioning_from_hover", 45);
+        } else if (cur_state == "flying_forward"){
+            ctrl->setState("transitioning_from_ff", 45);
+        } else {
+            std::cout << "ERROR STATE: can only transition from hover or from forward flight...\n";
+            std::cout << ctrl->getStatus();
+        }
     } else if(flight_command == "forward_flight") {
-        // snap props to forward configuration
-        ctrl->tiltProps(90);
+        if(ctrl->getState() == "transitional_flight"){
+            ctrl->setState("transitioning_to_forward", 90);
+        }else{
+            std::cout << "ERROR STATE: can only move to forward flight from transitional flight!\n";
+        }
+    } else if(flight_command == "hover") {
+        if(ctrl->getState() == "transitional_flight"){
+            ctrl->setState("transitioning_to_hover", 0);
+        }else{
+            std::cout << "ERROR STATE: can only move to hovering from transitional flight!\n";
+        }
     } else if(flight_command == "rotors_forward") {
         ctrl->tiltProps(ctrl->getTiltAngle() + 10);
     } else if(flight_command == "rotors_up") {
         ctrl->tiltProps(ctrl->getTiltAngle() - 10);
-    } else if(flight_command == "hover") {
-        // snap props to hover configuration
-        ctrl->tiltProps(0);
     } else if(flight_command == "elvs_up") {
         // use elevons to gain altitude
         ctrl->setElevons(ctrl->getElevonAngle(0) + 3);
