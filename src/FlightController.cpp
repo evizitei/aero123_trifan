@@ -181,11 +181,9 @@ void FlightController::landingStep()
     mtx.lock();
     double altitude = gpsPtr->getAltitude();
     if(altitude >50.0){                                //if drone is currently over 50 units in altitude
-        lockedUpdateMotors(2500); 
-        // stable - 500 OR 0.8333 of stable 
+        lockedUpdateMotors(2500); // stable - 500 OR 0.8333 of stable 
     }else if(altitude > 20.0){  //if drone is currently between 50 and 20 units
-        lockedUpdateMotors(2750); 
-        // stable - 250 OR 0.9167 of stable
+        lockedUpdateMotors(2750);  // stable - 250 OR 0.9167 of stable
     }else if(altitude >0.0 && altitude <= 20){     //if drone is below 20 units but not on the ground
         lockedUpdateMotors(2900); 
     }else if(altitude <= 0.0){

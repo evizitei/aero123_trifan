@@ -44,6 +44,77 @@ void printHelp()
     std::cout << "**************************************** \n\n\n";
 }
 
+bool carryOutCommand(FlightController* ctrl, Simulator* sim, std::string flight_command)
+{
+    if(flight_command == "shutdown") {
+        std::cout << "Aborting...\n";
+        return true;
+    } else if(flight_command == "help") {
+        printHelp();
+    } else if(flight_command == "arm") {
+        std::string cur_state = ctrl->getState();
+        if(cur_state == "off" || cur_state == "disarmed") {
+            ctrl->setState("arming", 500);
+        } else {
+            std::cout << "Unable to arm in this state...\n";
+            std::cout << ctrl->getStatus();
+        }
+    } else if(flight_command == "disarm") {
+        std::string cur_state = ctrl->getState();
+        if(cur_state == "armed" || cur_state == "landed") {
+            ctrl->setState("disarming", 0);
+        } else {
+            std::cout << "Unable to disarm in this state...\n";
+            std::cout << ctrl->getStatus();
+        }
+    } else if(flight_command == "takeoff") {
+        // probably should check arm/disarm here and abort if
+        // disarmed
+        ctrl->updateMotors(3500);
+    } else if(flight_command == "land") {
+        if(ctrl->getTiltAngle() == 0) {
+            ctrl->setState("landing", 0);
+        } else {
+            std::cout << "Please return to hover, before attempting to land. \n";
+        }
+    } else if(flight_command == "forward_flight") {
+        // snap props to forward configuration
+        ctrl->tiltProps(90);
+    } else if(flight_command == "rotors_forward") {
+        ctrl->tiltProps(ctrl->getTiltAngle() + 10);
+    } else if(flight_command == "rotors_up") {
+        ctrl->tiltProps(ctrl->getTiltAngle() - 10);
+    } else if(flight_command == "hover") {
+        // snap props to hover configuration
+        ctrl->tiltProps(0);
+    } else if(flight_command == "elvs_up") {
+        // use elevons to gain altitude
+        ctrl->setElevons(ctrl->getElevonAngle(0) + 3);
+    } else if(flight_command == "elvs_down") {
+        // use elevons to shed altitude
+        ctrl->setElevons(ctrl->getElevonAngle(0) - 3);
+    } else if(flight_command == "elvs_level") {
+        // bring elevons to neutral
+        ctrl->setElevons(0);
+    } else if(flight_command == "throttle_up") {
+        // increments motor speed by 250 RPM
+        ctrl->updateMotors(ctrl->getMotorSpeed(0) + 250);
+    } else if(flight_command == "throttle_down") {
+        // decrements motor speed by 250 RPM
+        ctrl->updateMotors(ctrl->getMotorSpeed(0) - 250);
+    } else if(flight_command == "gear_up") {
+        ctrl->setGearSrv(90);
+    } else if(flight_command == "gear_down") {
+        ctrl->setGearSrv(0);
+    } else if(flight_command == "status") {
+        std::cout << ctrl->getStatus() << "\n" << sim->getStatus() << "\n";
+    } else {
+        std::cout << "NO SUCH COMMAND!! " << flight_command << "\n\n";
+        printHelp();
+    }
+    return false;
+}
+
 int main()
 {
     std::cout << "Trifan initializing...\n";
@@ -69,112 +140,9 @@ int main()
         std::cout << "Input command...\n";
         std::getline(std::cin, flight_command);
         std::cout << "Executing Command: " << flight_command << "\n";
-        if(flight_command == "shutdown")
-        {
-            std::cout << "Aborting...\n";
+        bool abort = carryOutCommand(ctrl, sim, flight_command);
+        if(abort)
             break;
-        }
-        else if(flight_command == "help")
-        {
-            printHelp();
-        }
-        else if(flight_command == "arm")
-        {
-            std::string cur_state = ctrl->getState();
-            if(cur_state == "off" || cur_state == "disarmed"){
-                ctrl->setState("arming", 500);
-            }else{
-                std::cout << "Unable to arm in this state...\n";
-                std::cout << ctrl->getStatus();
-            }
-        }
-        else if(flight_command == "disarm")
-        {
-            std::string cur_state = ctrl->getState();
-            if(cur_state == "armed" || cur_state == "landed"){
-                ctrl->setState("disarming", 0);
-            }else{
-                std::cout << "Unable to disarm in this state...\n";
-                std::cout << ctrl->getStatus();
-            }
-        }
-        else if(flight_command == "takeoff")
-        {
-            // probably should check arm/disarm here and abort if
-            // disarmed
-            ctrl->updateMotors(3500);
-        }
-        else if(flight_command == "land")
-        {
-            if(ctrl->getTiltAngle() == 0) //checks to see if the drone is in hover
-            {
-                ctrl->setState("landing", 0);
-            }
-            else{
-                std::cout << "Please return to hover, before attempting to land. \n";
-            }
-        }
-        else if(flight_command == "forward_flight")
-        {
-            // snap props to forward configuration
-            ctrl->tiltProps(90);
-        }
-        else if(flight_command == "rotors_forward")
-        {
-            ctrl->tiltProps(ctrl->getTiltAngle() + 10);
-        }
-        else if(flight_command == "rotors_up")
-        {
-            ctrl->tiltProps(ctrl->getTiltAngle() - 10);
-        }
-        else if(flight_command == "hover")
-        {
-            // snap props to hover configuration
-            ctrl->tiltProps(0);
-        }
-        else if(flight_command == "elvs_up")
-        {
-            // use elevons to gain altitude
-            ctrl->setElevons(ctrl->getElevonAngle(0) + 3);
-        }
-        else if(flight_command == "elvs_down")
-        {
-            // use elevons to shed altitude
-            ctrl->setElevons(ctrl->getElevonAngle(0) - 3);
-        }
-        else if(flight_command == "elvs_level")
-        {
-            // bring elevons to neutral
-            ctrl->setElevons(0);
-        }
-        else if(flight_command == "throttle_up")
-        {
-            // increments motor speed by 250 RPM
-            ctrl->updateMotors(ctrl->getMotorSpeed(0) + 250);
-        }
-        else if(flight_command == "throttle_down")
-        {
-            // decrements motor speed by 250 RPM
-            ctrl->updateMotors(ctrl->getMotorSpeed(0) - 250);
-        }
-        else if(flight_command == "gear_up")
-        {
-            ctrl->setGearSrv(90);
-        }
-        else if(flight_command == "gear_down")
-        {
-            ctrl->setGearSrv(0);
-        }
-        else if(flight_command == "status")
-        {
-            std::cout << ctrl->getStatus() << "\n" << sim->getStatus() << "\n";
-        }
-        else
-        {
-            std::cout << "NO SUCH COMMAND!! " << flight_command << "\n\n";
-            printHelp();
-        }
-        
     }
     fLog->signalStop();
     sim->signalStop();
