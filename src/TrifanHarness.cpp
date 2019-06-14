@@ -6,6 +6,7 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <regex>
 
 void loggerThread(FlightLog* fPtr){
     fPtr->run();
@@ -27,7 +28,7 @@ void printHelp()
     std::cout << "  'arm'            -> turn motors on to idle \n";
     std::cout << "  'disarm'         -> turn motors off \n";
     std::cout << "  'shutdown'       -> kill the program \n";
-    std::cout << "  'takeoff'        -> turn motors up to gain hover altitude\n";
+    std::cout << "  'takeoff [alt]'  -> turn motors up to gain hover altitude\n";
     std::cout << "  'land'           -> turn motors down to shed hover altitude\n";
     std::cout << "  'forward_flight' -> flip propellors to 90deg (forward)\n";
     std::cout << "  'rotors_forward' -> nudge propellors towards forward flight\n";
@@ -56,7 +57,7 @@ bool carryOutCommand(FlightController* ctrl, Simulator* sim, std::string flight_
         if(cur_state == "off" || cur_state == "disarmed") {
             ctrl->setState("arming", 500);
         } else {
-            std::cout << "Unable to arm in this state...\n";
+            std::cout << "ERROR STATE:Unable to arm in this state...\n";
             std::cout << ctrl->getStatus();
         }
     } else if(flight_command == "disarm") {
@@ -64,13 +65,25 @@ bool carryOutCommand(FlightController* ctrl, Simulator* sim, std::string flight_
         if(cur_state == "armed" || cur_state == "landed") {
             ctrl->setState("disarming", 0);
         } else {
-            std::cout << "Unable to disarm in this state...\n";
+            std::cout << "ERROR STATE:Unable to disarm in this state...\n";
             std::cout << ctrl->getStatus();
         }
-    } else if(flight_command == "takeoff") {
-        // probably should check arm/disarm here and abort if
-        // disarmed
-        ctrl->updateMotors(3500);
+    } else if(flight_command.substr(0, 7) == "takeoff") {
+        std::regex r("\\b\\d+");
+        std::string takeoff_command;
+        std::smatch match;
+        if (std::regex_search(flight_command, match, r) != true){
+            std::cout << "ERROR STATE: You must provide an altitude to takeoff!\n\n";
+            return false;
+        }
+        std::string alt_param_str = match.str(0);
+        int alt_param = std::stod(alt_param_str);
+        if(ctrl->getState() == "armed"){
+            ctrl->setState("hover_climbing", alt_param);
+        }else{
+            std::cout << "ERROR STATE: Unable to takeoff in this state...\n";
+            std::cout << ctrl->getStatus();
+        }
     } else if(flight_command == "land") {
         if(ctrl->getTiltAngle() == 0) {
             ctrl->setState("landing", 0);

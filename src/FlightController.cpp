@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 
+const int RPM_EQUILLIBRIUM = 3000;
+
 FlightController::FlightController(Gps* gps)
 {
     mtx.lock();
@@ -181,11 +183,11 @@ void FlightController::landingStep()
     mtx.lock();
     double altitude = gpsPtr->getAltitude();
     if(altitude >50.0){                                //if drone is currently over 50 units in altitude
-        lockedUpdateMotors(2500); // stable - 500 OR 0.8333 of stable 
+        lockedUpdateMotors(RPM_EQUILLIBRIUM - 800); // stable - 500 OR 0.8333 of stable 
     }else if(altitude > 20.0){  //if drone is currently between 50 and 20 units
-        lockedUpdateMotors(2750);  // stable - 250 OR 0.9167 of stable
+        lockedUpdateMotors(RPM_EQUILLIBRIUM - 400);  // stable - 250 OR 0.9167 of stable
     }else if(altitude >0.0 && altitude <= 20){     //if drone is below 20 units but not on the ground
-        lockedUpdateMotors(2900); 
+        lockedUpdateMotors(RPM_EQUILLIBRIUM - 100); 
     }else if(altitude <= 0.0){
         state = "landed";
         state_threshold = 0;
@@ -197,7 +199,7 @@ void FlightController::armingStep()
 {
     mtx.lock();
     if(motor_front_right_bottom_speed < state_threshold){
-        lockedUpdateMotors(motor_front_right_bottom_speed + 100);
+        lockedUpdateMotors(motor_front_right_bottom_speed + 250);
     }else if(motor_front_right_bottom_speed >= state_threshold){
         lockedUpdateMotors(state_threshold);
         state = "armed";
@@ -209,10 +211,33 @@ void FlightController::disarmingStep()
 {
     mtx.lock();
     if(motor_front_right_bottom_speed > 0){
-        lockedUpdateMotors(motor_front_right_bottom_speed - 100);
+        lockedUpdateMotors(motor_front_right_bottom_speed - 500);
     }else if(motor_front_right_bottom_speed <= 0){
         lockedUpdateMotors(0);
         state = "disarmed";
+    }
+    mtx.unlock();
+}
+
+void FlightController::hoverClimbStep()
+{
+    mtx.lock();
+    double curAlt = gpsPtr->getAltitude();
+    if(curAlt < state_threshold){
+        if(motor_back_bottom_speed < RPM_EQUILLIBRIUM){
+            lockedUpdateMotors(motor_front_right_bottom_speed + 750);
+        } else if((state_threshold - curAlt) > 300) {
+            lockedUpdateMotors(motor_front_right_bottom_speed + 200);
+        }else if((state_threshold - curAlt) > 150){
+            lockedUpdateMotors(RPM_EQUILLIBRIUM + 1000);
+        }else if((state_threshold - curAlt) > 50){
+            lockedUpdateMotors(RPM_EQUILLIBRIUM + 500);
+        }else if((state_threshold - curAlt) < 25){
+            lockedUpdateMotors(RPM_EQUILLIBRIUM + 100);
+        }
+    }else if(curAlt >= state_threshold){
+        lockedUpdateMotors(RPM_EQUILLIBRIUM);
+        state = "hover";
     }
     mtx.unlock();
 }
@@ -228,6 +253,8 @@ void FlightController::run()
             armingStep();
         } else if (state == "disarming"){
             disarmingStep();
+        } else if (state == "hover_climbing"){
+            hoverClimbStep();
         } else if(state == "shutdown"){
             break;
         }

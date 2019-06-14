@@ -40,6 +40,7 @@ private:
     void landingStep();
     void armingStep();
     void disarmingStep();
+    void hoverClimbStep();
     void lockedMotorUpdate(TrifanMotorConfig conf);
     void lockedUpdateMotors(int rpm);
 
