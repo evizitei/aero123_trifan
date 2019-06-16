@@ -13,6 +13,7 @@ struct TrifanMotorConfig {
 };
 
 class Gps;
+class Gyroscope;
 
 /*
 internal members are confirgured to match
@@ -24,6 +25,7 @@ class FlightController
 {
 private:
     Gps* gpsPtr;
+    Gyroscope* gyPtr;
     int motor_front_right_bottom_speed;
     int motor_front_right_top_speed;
     int motor_back_bottom_speed;
@@ -45,11 +47,12 @@ private:
     void transFromForwardStep();
     void transToHoverStep();
     void transToForwardStep();
+    void bankStep();
     void lockedMotorUpdate(TrifanMotorConfig conf);
     void lockedUpdateMotors(int rpm);
 
 public:
-    FlightController(Gps* gps);
+    FlightController(Gps* gps, Gyroscope* gyro);
     int getMotorSpeed(int motorIndex);
     int getTiltAngle();
     int getElevonAngle(int elevonIndex);

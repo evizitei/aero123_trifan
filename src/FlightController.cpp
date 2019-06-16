@@ -1,17 +1,20 @@
 #include "FlightController.h"
 #include "Gps.h"
+#include "Gyroscope.h"
 #include <thread>
 #include <iostream>
 #include <string>
+#include <math.h>
 
 const int RPM_EQUILLIBRIUM = 3000;
 const int TRANS_POWER_EQUILLIBRIUM = 2600;
 const int FF_POWER_EQUILLIBRIUM = 1500;
 
-FlightController::FlightController(Gps* gps)
+FlightController::FlightController(Gps* gps, Gyroscope* gyro)
 {
     mtx.lock();
     gpsPtr = gps;
+    gyPtr = gyro;
     motor_front_right_bottom_speed = 0;
     motor_front_right_top_speed = 0;
     motor_back_bottom_speed = 0;
@@ -173,6 +176,7 @@ std::string FlightController::getStatus()
     status = status + "  LOCATION [ LAT: " + std::to_string(gpsPtr->getLatitude());
     status = status + " LNG: " + std::to_string(gpsPtr->getLongitude());
     status = status + " ALT: " + std::to_string(gpsPtr->getAltitude()) + " ]\n";
+    status = status + " PITCH: " + std::to_string(gyPtr->getPitch()) + "  ROLL: " + std::to_string(gyPtr->getRoll()) + "\n";
     mtx.unlock();
     return status;
 }
@@ -312,6 +316,48 @@ void FlightController::transToForwardStep()
     mtx.unlock();
 }
 
+void FlightController::bankStep()
+{
+    mtx.lock();
+    double curRoll = gyPtr->getRoll();
+    if(state_threshold > 0.0){
+        //banking right
+        if(curRoll >= state_threshold){
+            elevon_left_angle = 0;
+            elevon_right_angle = 0;
+            state = "flying_banked";
+        } else if (elevon_left_angle == 0){
+            elevon_left_angle = -5;
+            elevon_right_angle = 5;
+        }
+    }else if(state_threshold < 0.0){
+        //banking left
+        if(curRoll <= state_threshold){
+            elevon_left_angle = 0;
+            elevon_right_angle = 0;
+            state = "flying_banked";
+        } else if (elevon_left_angle == 0){
+            elevon_left_angle = 5;
+            elevon_right_angle = -5;
+        }
+    }else{
+        // returning to level
+        if(abs(curRoll) < 5.0){
+            gyPtr->updateOrientation(gyPtr->getPitch(), 0.0);
+            elevon_left_angle = 0;
+            elevon_right_angle = 0;
+            state = "flying_forward";
+        }else if(curRoll < 0.0){
+            elevon_left_angle = -5;
+            elevon_right_angle = 5;
+        }else if(curRoll > 0.0){
+            elevon_left_angle = 5;
+            elevon_right_angle = -5;
+        }
+    }
+    mtx.unlock();
+}
+
 bool FlightController::processStep()
 {
     if (state == "landing"){
@@ -330,6 +376,8 @@ bool FlightController::processStep()
         transToHoverStep();
     } else if (state == "transitioning_to_forward"){
         transToForwardStep();
+    } else if (state == "rolling"){
+        bankStep();
     } else if(state == "shutdown"){
         return true;
     }

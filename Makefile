@@ -21,6 +21,7 @@ test:
 	  $(SRCDIR)/FlightController.cpp \
 	  $(SRCDIR)/FlightLog.cpp \
 	  $(SRCDIR)/Gps.cpp \
+	  $(SRCDIR)/Gyroscope.cpp \
 	  $(SRCDIR)/Simulator.cpp
 	./test/bin/system_tests
 

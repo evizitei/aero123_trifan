@@ -1,6 +1,7 @@
 #include "FlightController.h"
 #include "FlightLog.h"
 #include "Gps.h"
+#include "Gyroscope.h"
 #include "Simulator.h"
 #include <iostream>
 #include <string>
@@ -33,6 +34,10 @@ void printHelp()
     std::cout << "  'trans_flight'   -> gently transition to 45 degree flight\n"; 
     std::cout << "  'forward_flight' -> transition propellors to 90deg (forward)\n";
     std::cout << "  'hover'          -> transition props to 0 (hover) \n";
+    std::cout << "  'status'         -> print flight log current entry\n";
+    std::cout << "  'bank_right'     -> move elevons to roll into a right turn\n";
+    std::cout << "  'bank_left'      -> move elevons to roll into a left turn\n";
+    std::cout << "  'level_flight'   -> use elevons to roll back to stable forward flight\n";
     std::cout << "  'rotors_forward' -> nudge propellors towards forward flight\n";
     std::cout << "  'rotors_up'      -> nudge propellors towards hover\n";
     std::cout << "  'elvs_up'        -> nudge angle of elevons for climb\n";
@@ -42,7 +47,6 @@ void printHelp()
     std::cout << "  'throttle_down'  -> turn motors down by 250 RPM\n";
     std::cout << "  'gear_up'        -> stow landing gear\n";
     std::cout << "  'gear_down'      -> deploy landing gear\n";
-    std::cout << "  'status'         -> print flight log current entry\n";
     std::cout << "**************************************** \n\n\n";
 }
 
@@ -113,6 +117,28 @@ bool carryOutCommand(FlightController* ctrl, Simulator* sim, std::string flight_
         }else{
             std::cout << "ERROR STATE: can only move to hovering from transitional flight!\n";
         }
+    } else if(flight_command == "bank_right"){
+        if(ctrl->getState() == "flying_forward"){
+            ctrl->setState("rolling", 15);
+        } else {
+            std::cout << "ERROR STATE: can only bank turn from forward flight...\n";
+            std::cout << ctrl->getStatus();
+        }
+    } else if(flight_command == "bank_left"){
+        if(ctrl->getState() == "flying_forward"){
+            ctrl->setState("rolling", -15);
+        } else {
+            std::cout << "ERROR STATE: can only bank turn from forward flight...\n";
+            std::cout << ctrl->getStatus();
+        }
+    } else if(flight_command == "level_flight"){
+        std::string cur_state = ctrl->getState();
+        if(cur_state == "flying_forward" || cur_state == "flying_banked"){
+            ctrl->setState("rolling", 0);
+        } else {
+            std::cout << "ERROR STATE: can only bank turn from forward flight...\n";
+            std::cout << ctrl->getStatus();
+        }
     } else if(flight_command == "rotors_forward") {
         ctrl->tiltProps(ctrl->getTiltAngle() + 10);
     } else if(flight_command == "rotors_up") {
@@ -149,11 +175,12 @@ int main()
 {
     std::cout << "Trifan initializing...\n";
     Gps* gps = new Gps(stable);
-    FlightController* ctrl = new FlightController(gps);
+    Gyroscope* gyro = new Gyroscope();
+    FlightController* ctrl = new FlightController(gps, gyro);
     std::string log_name = "flight.log";
     int log_interval = 3; // write status ever 3 seconds
     FlightLog* fLog = new FlightLog(ctrl, log_name);
-    Simulator* sim = new Simulator(ctrl, gps);
+    Simulator* sim = new Simulator(ctrl, gps, gyro);
     std::cout << "\n" << "...Initialized!\n" << "Logging to " << log_name << "\n\n";
     printHelp();
     std::string flight_command;

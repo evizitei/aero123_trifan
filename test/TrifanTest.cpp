@@ -4,11 +4,13 @@
 #include "../src/FlightController.h"
 #include "../src/FlightLog.h"
 #include "../src/Gps.h"
+#include "../src/Gyroscope.h"
 
 bool TestMotorInit()
 {
     Gps gps { stable };
-    FlightController ctrl { &gps };
+    Gyroscope gyro { };
+    FlightController ctrl { &gps, &gyro };
     int speed = ctrl.getMotorSpeed(0);
     assert(speed == 0);
     return true;
@@ -17,7 +19,8 @@ bool TestMotorInit()
 bool TestFlightStatusMessage()
 {
     Gps gps { stable };
-    FlightController ctrl { &gps };
+    Gyroscope gyro { };
+    FlightController ctrl { &gps, &gyro };
     TrifanMotorConfig cfg = {
         { 3, 3},
         { 3, 3},
@@ -32,7 +35,8 @@ bool TestFlightStatusMessage()
 bool TestFlightLogging() 
 {
     Gps gps { stable };
-    FlightController ctrl { &gps };
+    Gyroscope gyro { };
+    FlightController ctrl { &gps, &gyro };
     FlightLog* fLog = new FlightLog(&ctrl, "test.log");
     fLog->logMessage("Test The Messaging");
     fLog->close();

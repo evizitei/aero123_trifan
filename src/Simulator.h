@@ -6,12 +6,14 @@
 class FlightController;
 class Gps;
 class FlightLog;
+class Gyroscope;
 
 class Simulator
 {
 private:
     FlightController* ctrl;
     Gps* gps;
+    Gyroscope* gyro;
     bool shouldStop;
     std::string logFileName;
     std::ofstream logStream;
@@ -26,7 +28,7 @@ private:
     void logMessage(std::string message);
 
 public:
-    Simulator(FlightController* cPtr, Gps* gpsPtr);
+    Simulator(FlightController* cPtr, Gps* gpsPtr, Gyroscope* gyro);
     void run();
     void signalStop();
     std::string getStatus();

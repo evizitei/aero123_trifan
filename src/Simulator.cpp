@@ -1,6 +1,7 @@
 #include "FlightController.h"
 #include "Simulator.h"
 #include "Gps.h"
+#include "Gyroscope.h"
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -12,11 +13,12 @@ const int RPM_EQUILLIBRIUM = 3000;
 const int TRANS_POWER_EQUILLIBRIUM = 2600;
 const int FF_POWER_EQUILLIBRIUM = 1500;
 
-Simulator::Simulator(FlightController* cPtr, Gps* gpsPtr)
+Simulator::Simulator(FlightController* cPtr, Gps* gpsPtr, Gyroscope* gyPtr)
 {
     mtx.lock();
     ctrl = cPtr;
     gps = gpsPtr;
+    gyro = gyPtr;
     shouldStop = false;
     aoa = 0.0;
     heading = 0.0;
@@ -57,10 +59,15 @@ void Simulator::simulateForwardFlight()
     mtx.lock();
     int era = ctrl->getElevonAngle(0);
     int ela = ctrl->getElevonAngle(1);
+    double roll = gyro->getRoll();
     if(era == ela)
     {
         // elevons are equal, so adjust AOA by an invented factor
         aoa = aoa + (double(era) / 8.0);
+    }else{
+        // elevons are offset, bank by difference.
+        double elDelta = era - ela;
+        roll = roll + (elDelta / 5.0);
     }
     mtx.unlock();
 
@@ -78,6 +85,8 @@ void Simulator::simulateForwardFlight()
         gps->updateAltitude(delta);
         altShortCircuited = true;
     }
+    gyro->updateOrientation(aoa, roll);
+    heading = heading + (double(roll) / 2.0);
 
     // AOA is stable
     // assume all motors at same speed for now
