@@ -162,7 +162,6 @@ void Simulator::simulateTransitionalFlight()
     double delta = altitude_component * 3.28;
     if(!altShortCircuited)
         gps->updateAltitude(delta);
-    std::cout << "Transitional Lateral Vector: " << std::to_string(lateral_component) << "\n";
     simulateCoordinateMotion(lateral_component);
 }
 
