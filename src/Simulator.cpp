@@ -156,12 +156,13 @@ void Simulator::simulateTransitionalFlight()
     int tilt = ctrl->getTiltAngle();
     double altitude_component = sin(abs(90 - tilt) * (PI/180)) * vector_magnitude;
     double weight_factor = 6.5;
-    altitude_component = altitude_component - weight_factor;
     lateral_component = sqrt((vector_magnitude*vector_magnitude) - (altitude_component*altitude_component));
+    altitude_component = altitude_component - weight_factor;
     //3.28 feet to meter
     double delta = altitude_component * 3.28;
     if(!altShortCircuited)
         gps->updateAltitude(delta);
+    std::cout << "Transitional Lateral Vector: " << std::to_string(lateral_component) << "\n";
     simulateCoordinateMotion(lateral_component);
 }
 

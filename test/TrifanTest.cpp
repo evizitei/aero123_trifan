@@ -79,6 +79,15 @@ bool TestSimulatorHeading()
     return true;
 }
 
+bool TestGyroAccessors()
+{
+    Gyroscope gyro{};
+    gyro.updateOrientation(1.7, -2.5);
+    assert(gyro.getPitch() == 1.7);
+    assert(gyro.getRoll() == -2.5);
+    return true;
+}
+
 int main ()
 {
     TestMotorInit();
@@ -86,6 +95,7 @@ int main ()
     TestFlightLogging();
     TestGpsInit();
     TestSimulatorHeading();
+    TestGyroAccessors();
     std::cout << "----------\n" << "All Tests Pass!\n" << "----------\n";
     return 0;
 }
