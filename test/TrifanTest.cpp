@@ -5,6 +5,7 @@
 #include "../src/FlightLog.h"
 #include "../src/Gps.h"
 #include "../src/Gyroscope.h"
+#include "../src/Simulator.h"
 
 bool TestMotorInit()
 {
@@ -58,12 +59,33 @@ bool TestGpsInit()
     return true;
 }
 
+bool TestSimulatorHeading()
+{
+    // no roll means no heading change
+    double new_heading = TextSim::computeHeading(0.0, 0.0); 
+    assert(new_heading == 0.0);
+    // right roll means positive heading change
+    new_heading = TextSim::computeHeading(0.0, 10.0); 
+    assert(new_heading == 5.0);
+    // left roll means negative heading change
+    new_heading = TextSim::computeHeading(120.0, -10.0); 
+    assert(new_heading == 115.0);
+    // negative heading loops around
+    new_heading = TextSim::computeHeading(2.0, -10.0);
+    assert(new_heading == 357.0);
+    // looping around past 360 starts over
+    new_heading = TextSim::computeHeading(359.0, 10.0);
+    assert(new_heading == 4.0);
+    return true;
+}
+
 int main ()
 {
     TestMotorInit();
     TestFlightStatusMessage();
     TestFlightLogging();
     TestGpsInit();
+    TestSimulatorHeading();
     std::cout << "----------\n" << "All Tests Pass!\n" << "----------\n";
     return 0;
 }

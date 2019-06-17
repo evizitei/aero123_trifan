@@ -13,6 +13,19 @@ const int RPM_EQUILLIBRIUM = 3000;
 const int TRANS_POWER_EQUILLIBRIUM = 2600;
 const int FF_POWER_EQUILLIBRIUM = 1500;
 
+namespace TextSim {
+    double computeHeading(double cur_heading, double roll_angle)
+    {
+        double new_heading = cur_heading + (double(roll_angle) / 2.0);
+        if(new_heading < 0.0){
+            new_heading = 360 + new_heading;
+        }else if (new_heading > 360.0) {
+            new_heading = new_heading - 360.0;
+        }
+        return new_heading;
+    }
+}
+
 Simulator::Simulator(FlightController* cPtr, Gps* gpsPtr, Gyroscope* gyPtr)
 {
     mtx.lock();
@@ -86,7 +99,7 @@ void Simulator::simulateForwardFlight()
         altShortCircuited = true;
     }
     gyro->updateOrientation(aoa, roll);
-    heading = heading + (double(roll) / 2.0);
+    heading = TextSim::computeHeading(heading, roll);
 
     // AOA is stable
     // assume all motors at same speed for now

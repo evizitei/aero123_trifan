@@ -8,6 +8,10 @@ class Gps;
 class FlightLog;
 class Gyroscope;
 
+namespace TextSim {
+    double computeHeading(double cur_heading, double roll_angle);
+}
+
 class Simulator
 {
 private:
