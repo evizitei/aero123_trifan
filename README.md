@@ -43,6 +43,48 @@ Thread model: posix
 
 but any modern c++ compiler should do fine.
 
+
+
+### Building and Running!
+
+If you want to remove any existing build artifacts you can use:
+
+`make clean`
+
+To execute the flight controller, you can use
+
+`make run`
+
+which will re-build the binary and run it.
+Four threads will be started: one to accept
+command input, one to run the simulator
+for feeding position changes into the GPS,
+one for processing state changes and decisions in
+the flight controller, and one to log the status of the
+system to the flight log on disk.
+
+The CLI will provide you with commands you can use to "control"
+the flight.
+
+To see the log after a flight, you can read through `simulator.log` and `flight.log`,
+or alternatively tail the log while the flight is in progress
+in another console:
+
+`tail -f simulator.log`
+
+Tailing the log realtime gives you an ongoing dashboard.  It's highly recommended to 
+keep the simulator log open in one terminal and be running the
+instruction loop in another so that you can avoid having to use the `status`
+command over and over again to know the current position of the aircraft.
+
+![Flight Sim](docs/flight_sim.png)
+
+The simulator log has both the status of each device, and also the
+inferred values of things like heading and AOA from the simulator
+status, which is useful for figuring out how control changes
+translated into flight status changes.  The simulator.log has everything
+in the flight.log.
+
 ### IF YOU'RE USING CYGWIN ON WINDOWS
 
 If you'd like an editor amenable to this kind of process, consider installing
@@ -88,47 +130,6 @@ github:
 Then you should be able to do the commands that follow below just like a mac or linux user.
 
 #### End Windows-only Section
-
-### Building and Running!
-
-If you want to remove any existing build artifacts you can use:
-
-`make clean`
-
-To execute the flight controller, you can use
-
-`make run`
-
-which will re-build the binary and run it.
-Four threads will be started: one to accept
-command input, one to run the simulator
-for feeding position changes into the GPS,
-one for processing state changes and decisions in
-the flight controller, and one to log the status of the
-system to the flight log on disk.
-
-The CLI will provide you with commands you can use to "control"
-the flight.
-
-To see the log after a flight, you can read through `simulator.log` and `flight.log`,
-or alternatively tail the log while the flight is in progress
-in another console:
-
-`tail -f simulator.log`
-
-Tailing the log realtime gives you an ongoing dashboard.  It's highly recommended to 
-keep the simulator log open in one terminal and be running the
-instruction loop in another so that you can avoid having to use the `status`
-command over and over again to know the current position of the aircraft.
-
-![Flight Sim](doc/flight_sim.png)
-
-The simulator log has both the status of each device, and also the
-inferred values of things like heading and AOA from the simulator
-status, which is useful for figuring out how control changes
-translated into flight status changes.  The simulator.log has everything
-in the flight.log.
-
 
 ## Running tests
 
