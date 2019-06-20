@@ -43,8 +43,6 @@ Thread model: posix
 
 but any modern c++ compiler should do fine.
 
-
-
 ### Building and Running!
 
 If you want to remove any existing build artifacts you can use:
@@ -77,7 +75,7 @@ keep the simulator log open in one terminal and be running the
 instruction loop in another so that you can avoid having to use the `status`
 command over and over again to know the current position of the aircraft.
 
-![Flight Sim](docs/flight_sim.png)
+![Flight Sim](doc/flight_sim.png)
 
 The simulator log has both the status of each device, and also the
 inferred values of things like heading and AOA from the simulator
