@@ -116,6 +116,13 @@ in another console:
 
 `tail -f simulator.log`
 
+Tailing the log realtime gives you an ongoing dashboard.  It's highly recommended to 
+keep the simulator log open in one terminal and be running the
+instruction loop in another so that you can avoid having to use the `status`
+command over and over again to know the current position of the aircraft.
+
+![Flight Sim](docs/flight_sim.png)
+
 The simulator log has both the status of each device, and also the
 inferred values of things like heading and AOA from the simulator
 status, which is useful for figuring out how control changes
